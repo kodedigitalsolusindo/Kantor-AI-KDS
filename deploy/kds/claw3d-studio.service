@@ -1,0 +1,24 @@
+[Unit]
+Description=Claw3D studio — Kantor AI KDS
+After=network-online.target openclaw-gateway.service
+
+[Service]
+User=claw3d
+Group=claw3d
+WorkingDirectory=/opt/claw3d/app
+Environment=NODE_ENV=production
+Environment=PORT=3200
+Environment=HOST=127.0.0.1
+Environment=NEXT_TELEMETRY_DISABLED=1
+Environment=UPSTREAM_ALLOWLIST=localhost,127.0.0.1
+# Lihat deploy/kds/studio.env.example. File asli berisi token gateway, chmod 600, tidak ikut repo.
+EnvironmentFile=/etc/claw3d/studio.env
+ExecStart=/usr/bin/node server/index.js
+Restart=on-failure
+RestartSec=3
+Nice=10
+MemoryMax=900M
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

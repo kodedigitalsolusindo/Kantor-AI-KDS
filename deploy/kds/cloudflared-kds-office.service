@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloudflare Tunnel (domain publik -> Claw3D studio 127.0.0.1:3200)
+After=network-online.target claw3d-studio.service
+Wants=network-online.target
+
+[Service]
+# Token tunnel (remotely managed) disimpan di file terpisah, chmod 600, TIDAK ikut repo.
+ExecStart=/usr/bin/cloudflared --no-autoupdate tunnel run --token-file /etc/cloudflared/kds-office.token
+Restart=on-failure
+RestartSec=5
+MemoryMax=200M
+
+[Install]
+WantedBy=multi-user.target

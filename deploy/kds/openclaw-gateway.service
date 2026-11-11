@@ -1,0 +1,28 @@
+[Unit]
+Description=OpenClaw Gateway (KDS agents, loopback 127.0.0.1:18789)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=openclaw
+Group=openclaw
+WorkingDirectory=/opt/openclaw
+Environment=HOME=/opt/openclaw
+Environment=PATH=/usr/local/lib/nodejs/node-v24.22.1-linux-x64/bin:/usr/local/bin:/usr/bin:/bin
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--max-old-space-size=1536
+# API key provider (DeepSeek / Anthropic / OpenRouter) disimpan di /opt/openclaw/.openclaw/.env (chmod 600),
+# token gateway di /opt/openclaw/.openclaw/openclaw.json — keduanya TIDAK ikut repo.
+ExecStart=/usr/local/lib/nodejs/node-v24.22.1-linux-x64/bin/openclaw gateway --port 18789 --bind loopback
+Restart=on-failure
+RestartSec=5
+Nice=5
+MemoryHigh=2800M
+MemoryMax=3200M
+OOMPolicy=continue
+KillMode=mixed
+TimeoutStopSec=330
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
