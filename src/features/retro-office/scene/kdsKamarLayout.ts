@@ -70,11 +70,11 @@ export function kamarPieces(blanket: string): KamarPiece[] {
     { id: "chair-back", lx: 79, ly: 92, w: 23, d: 3, z0: m(0.42), h: m(0.4), color: "#0b1f3a" },
     { id: "chair-leg", lx: 88, ly: 101, w: 5, d: 5, z0: 0, h: m(0.42), color: "#333a44" },
     { id: "desk-lamp", lx: 68, ly: 120, w: 6, d: 6, z0: m(0.68) + 0.02, h: m(0.28), color: "#fff7d6", emissive: "#fff7d6" },
-    // AC dinding 0,9 x 0,3 m setinggi ±2,2 m (skala tinggi nyata), di dinding luar timur yang setinggi
-    // lantai penuh, di atas kepala tempat tidur; kisi & LED menghadap ke dalam kamar.
-    { id: "ac", lx: 210, ly: 70, w: 14, d: 52, z0: fm(2.2), h: fm(0.3), color: "#cfd8e3" },
-    { id: "ac-vent", lx: 209, ly: 74, w: 1, d: 44, z0: fm(2.24), h: fm(0.06), color: "#475569" },
-    { id: "ac-led", lx: 209, ly: 116, w: 1, d: 3, z0: fm(2.44), h: fm(0.03), color: "#38bdf8", emissive: "#38bdf8" },
+    // AC dinding 0,9 x 0,28 m pada ±1,65 m (skala nyata) di dinding utara kamar (menghadap kamera),
+    // tetap di bawah puncak dinding kamar (ROOM_WALL_H 2,2 di kdsLantai2.tsx). Kisi & LED menghadap ke dalam kamar.
+    { id: "ac", lx: 40, ly: 6, w: 52, d: 12, z0: fm(1.65), h: fm(0.28), color: "#cfd8e3" },
+    { id: "ac-vent", lx: 44, ly: 18, w: 44, d: 1, z0: fm(1.69), h: fm(0.06), color: "#475569" },
+    { id: "ac-led", lx: 84, ly: 18, w: 3, d: 1, z0: fm(1.86), h: fm(0.03), color: "#38bdf8", emissive: "#38bdf8" },
   ];
 }
 
