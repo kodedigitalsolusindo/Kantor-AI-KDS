@@ -5206,15 +5206,19 @@ export function RetroOffice3D({
 
   const lastOfficeCenterSignalRef = useRef(officeCenterSignal);
 
+  // Preset aktif mengikuti level: bila halaman dibuka dengan level tersimpan LT.2,
+  // kamera langsung memakai preset LT.2 (bukan overview LT.1).
+  const activeLevelPreset = level2 ? lantai2Preset : overviewPreset;
+
   useEffect(() => {
-    cameraPresetRef.current = overviewPreset;
-  }, [overviewPreset]);
+    cameraPresetRef.current = activeLevelPreset;
+  }, [activeLevelPreset]);
 
   useEffect(() => {
     if (officeCenterSignal === lastOfficeCenterSignalRef.current) return;
     lastOfficeCenterSignalRef.current = officeCenterSignal;
-    cameraPresetRef.current = overviewPreset;
-  }, [officeCenterSignal, overviewPreset]);
+    cameraPresetRef.current = activeLevelPreset;
+  }, [officeCenterSignal, activeLevelPreset]);
 
   return (
     <div className="relative w-full h-full bg-[#1a1008] font-mono text-white overflow-hidden">

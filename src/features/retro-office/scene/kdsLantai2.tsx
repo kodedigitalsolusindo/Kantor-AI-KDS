@@ -12,6 +12,12 @@ import {
 } from "@/features/retro-office/core/furnitureDefaults";
 import { toWorld } from "@/features/retro-office/core/geometry";
 import { KDS_STORY } from "@/features/retro-office/scene/kdsRuko";
+import {
+  KAMAR_STARTS,
+  KAMAR_X0,
+  SLAB_TOP,
+  kamarPieces,
+} from "@/features/retro-office/scene/kdsKamarLayout";
 
 // Lantai 2 Kantor AI KDS — scene dasar (KAN-6).
 // Zonasi & koordinat mengacu KAN-5 (denah disetujui owner). Semua koordinat lokal ruko
@@ -231,13 +237,39 @@ function L2BathLaundry() {
   return null;
 }
 
+// Furnitur Kamar 1-4 (KAN-7): geometri kotak sederhana, tanpa bayangan.
+const KAMAR_BLANKETS = ["#2563eb", "#16a596", "#2563eb", "#16a596"];
+function L2Kamar() {
+  return (
+    <group>
+      {KAMAR_STARTS.map((y0, i) =>
+        kamarPieces(KAMAR_BLANKETS[i]).map((p) => (
+          <Box
+            key={`kamar-${i + 1}-${p.id}`}
+            x={KAMAR_X0 + p.lx}
+            y={y0 + p.ly}
+            w={p.w}
+            d={p.d}
+            z0={SLAB_TOP + p.z0}
+            h={p.h}
+            color={p.color}
+            emissive={p.emissive}
+          />
+        )),
+      )}
+    </group>
+  );
+}
+
+// Signage KAMAR 1-4 diletakkan di sisi koridor (x=96) dan di atas puncak dinding partisi (z 1.3)
+// supaya seluruh teks terlihat dari kamera isometrik (tidak tertutup dinding x 116..122).
 function L2Signage() {
   return (
     <group>
-      <Sign x={130} y={455} z={0.62} text="KAMAR 1" width={panelWidth(7)} />
-      <Sign x={130} y={612} z={0.62} text="KAMAR 2" width={panelWidth(7)} />
-      <Sign x={130} y={769} z={0.62} text="KAMAR 3" width={panelWidth(7)} />
-      <Sign x={130} y={926} z={0.62} text="KAMAR 4" width={panelWidth(7)} />
+      <Sign x={96} y={455} z={1.3} text="KAMAR 1" width={panelWidth(7)} />
+      <Sign x={96} y={612} z={1.3} text="KAMAR 2" width={panelWidth(7)} />
+      <Sign x={96} y={769} z={1.3} text="KAMAR 3" width={panelWidth(7)} />
+      <Sign x={96} y={926} z={1.3} text="KAMAR 4" width={panelWidth(7)} />
       <Sign x={118} y={119} z={0.62} text="KAMAR MANDI" width={panelWidth(11)} />
       <Sign x={118} y={269} z={0.62} text="LAUNDRY" width={panelWidth(7)} />
       <Sign x={58} y={1060} z={0.7} text="RUANG MAKAN" width={panelWidth(11)} />
@@ -283,6 +315,7 @@ export const KdsLantai2Scene = memo(function KdsLantai2Scene() {
       <L2Walls />
       <L2Stairs />
       <L2BathLaundry />
+      <L2Kamar />
       <L2Signage />
       <L2Lights />
     </group>

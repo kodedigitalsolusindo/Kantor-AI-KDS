@@ -82,3 +82,12 @@ Palet: navy `#0b1f3a` (papan), teal `#16a596` (aksen), biru `#2563eb` (ikon), te
 - Namespace storage `kds-ruko-v10` **tidak dinaikkan**; toggle lantai memakai key terpisah `kds:office-level`.
 - Tanpa kredensial/token/IP/email di commit.
 
+
+## Kamar 1-4 (KAN-7)
+
+- Furnitur per kamar (data di `scene/kdsKamarLayout.ts`, diuji di `tests/unit/kdsKamarLayout.test.ts`): bunk bed 2,0 x 1,0 m (116 x 58 satuan) rapat dinding timur/utara, lemari 1,2 x 0,55 m, meja 1,0 x 0,5 m + kursi + lampu baca, AC dinding.
+- Dimensi horizontal nyata (1 m = 58 satuan). Tinggi dikompres 0,36 unit dunia per meter nyata karena KDS_STORY 1,05 mewakili satu lantai; semua furnitur lebih rendah dari dinding (1,05), jadi tidak menembus langit-langit.
+- Pintu di dinding x 116..122 (y0+12..y0+58) menghadap koridor; area depan pintu bebas furnitur lantai.
+- Signage KAMAR 1-4 digeser ke sisi koridor (x=96) dan dinaikkan di atas puncak partisi (z 1,3) agar teks penuh terlihat.
+- Halaman dibuka dengan level tersimpan LT.2 -> kamera langsung memakai preset LT.2.
+- Geometri kotak sederhana, tanpa bayangan, tanpa pointLight tambahan.
