@@ -30,7 +30,8 @@ const TEAL = "#16a596";
 const TEAL_DARK = "#0f7f74";
 const NAVY = "#0b1f3a";
 const BLUE = "#2563eb";
-const STORY = 1.05;
+export const KDS_STORY = 1.05;
+const STORY = KDS_STORY;
 
 type BoxProps = {
   x: number;
@@ -309,14 +310,9 @@ const TEAM_BY_ROW = [
   { short: "SEO & DIGITAL MARKETING", rug: "#fbe0d4", accent: "#f4511e" },
 ];
 
-function Interior() {
-  const tiles: ReactNode[] = [];
-  for (let gx = M; gx < W; gx += M) {
-    tiles.push(<Box key={`tx${gx}`} x={gx - 1} y={400} w={2} d={D - 400} z0={0.001} h={0.002} color="#d6cdbd" />);
-  }
-  for (let gy = 400 + M; gy < D; gy += M) {
-    tiles.push(<Box key={`ty${gy}`} x={0} y={gy - 1} w={W} d={2} z0={0.001} h={0.002} color="#d6cdbd" />);
-  }
+// Cangkang luar L1: lantai dasar + tangga ke L2 + dinding keliling (badan bangunan).
+// Tetap tampil saat LT.2 agar Lantai 2 tampak berdiri di atas ruko.
+function L1Shell() {
   const stairs: ReactNode[] = [];
   for (let i = 0; i < 9; i += 1) {
     stairs.push(
@@ -326,6 +322,24 @@ function Interior() {
   return (
     <group>
       <Box x={0} y={0} w={W} d={D} z0={-0.02} h={0.02} color="#eee8dc" />
+      {stairs}
+      <Box x={-8} y={-8} w={W + 16} d={8} h={STORY} color="#f4f1ea" />
+      <Box x={-8} y={0} w={8} d={D} h={STORY} color="#f4f1ea" />
+      <Box x={W} y={0} w={8} d={D} h={STORY} color="#f4f1ea" />
+    </group>
+  );
+}
+
+function Interior() {
+  const tiles: ReactNode[] = [];
+  for (let gx = M; gx < W; gx += M) {
+    tiles.push(<Box key={`tx${gx}`} x={gx - 1} y={400} w={2} d={D - 400} z0={0.001} h={0.002} color="#d6cdbd" />);
+  }
+  for (let gy = 400 + M; gy < D; gy += M) {
+    tiles.push(<Box key={`ty${gy}`} x={0} y={gy - 1} w={W} d={2} z0={0.001} h={0.002} color="#d6cdbd" />);
+  }
+  return (
+    <group>
       {tiles}
       <Box x={0} y={0} w={108} d={115} z0={0.001} h={0.003} color="#dfe6ea" />
       <Box x={116} y={0} w={110} d={115} z0={0.001} h={0.003} color="#3b4652" />
@@ -334,7 +348,6 @@ function Interior() {
       <Box x={124} y={1178} w={224} d={252} z0={0.001} h={0.003} color="#e3e9ee" />
       <Box x={0} y={1438} w={W} d={92} z0={0.001} h={0.003} color="#ebe3d4" />
       <Box x={0} y={1538} w={W} d={202} z0={0.001} h={0.003} color="#efe6d6" />
-      {stairs}
       <Box x={342} y={10} w={4} d={320} z0={0.9} h={0.04} color="#8d6e63" />
 
       <Label x={50} y={124} z={1.12} text="TOILET" size={0.08} color={NAVY} />
@@ -405,10 +418,6 @@ function Interior() {
       <Label x={304} y={1546} z={0.5} text="KodeSolusindo" size={0.05} />
       <Label x={304} y={1546} z={0.41} text="Software House" size={0.028} color="#9fd8d1" />
 
-      {/* Dinding keliling: belakang dan dinding bersama tetangga */}
-      <Box x={-8} y={-8} w={W + 16} d={8} h={STORY} color="#f4f1ea" />
-      <Box x={-8} y={0} w={8} d={D} h={STORY} color="#f4f1ea" />
-      <Box x={W} y={0} w={8} d={D} h={STORY} color="#f4f1ea" />
     </group>
   );
 }
@@ -552,15 +561,20 @@ function Street() {
   );
 }
 
-export const KdsRukoScene = memo(function KdsRukoScene() {
+export const KdsRukoScene = memo(function KdsRukoScene({
+  showInterior = true,
+}: {
+  showInterior?: boolean;
+}) {
   return (
     <group position={[KDS_ORIGIN_X * SCALE, 0, KDS_ORIGIN_Y * SCALE]}>
       <Street />
-      <Interior />
+      <L1Shell />
+      {showInterior ? <Interior /> : null}
       <Facade />
-      <KdsCats />
+      {showInterior ? <KdsCats /> : null}
       {/* Tata, resepsionis penerima tamu, standby di belakang meja depan menghadap pintu masuk */}
-      <KdsReceptionist x={205} y={1466} name="Tata" />
+      {showInterior ? <KdsReceptionist x={205} y={1466} name="Tata" /> : null}
       <RukoNeighbor x={-8 - NEIGHBOR_W} baseColor="#ece8e1" accent="#d81b60" sign="SALON" shopfront="glass" terrace="#b4533c" />
       <RukoNeighbor x={-16 - NEIGHBOR_W * 2} baseColor="#e7a1a6" accent="#6d4c41" sign="TOKO" shopfront="rolling" />
       <RukoNeighbor x={-24 - NEIGHBOR_W * 3} baseColor="#f3efe7" accent="#455a64" sign="BENGKEL" shopfront="rolling" />

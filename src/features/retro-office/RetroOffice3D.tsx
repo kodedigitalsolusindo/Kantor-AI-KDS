@@ -93,7 +93,8 @@ import {
   materializeDefaults,
   type OfficeLayoutPreset,
 } from "@/features/retro-office/core/furnitureDefaults";
-import { KdsRukoScene } from "@/features/retro-office/scene/kdsRuko";
+import { KdsRukoScene, KDS_STORY } from "@/features/retro-office/scene/kdsRuko";
+import { KdsLantai2Scene } from "@/features/retro-office/scene/kdsLantai2";
 import { ImacModel } from "@/features/retro-office/objects/imac";
 import { ReceptionDeskModel } from "@/features/retro-office/objects/reception";
 import { MeetingTableModel } from "@/features/retro-office/objects/meetingTable";
@@ -2551,6 +2552,17 @@ export function RetroOffice3D({
     [defaultRemoteLayoutFurniture, remoteLayoutSnapshot, remoteOfficeEnabled],
   );
   const [editMode, setEditMode] = useState(false);
+  const [officeLevel, setOfficeLevel] = useState<1 | 2>(() => {
+    try {
+      return typeof window !== "undefined" &&
+        window.localStorage.getItem("kds:office-level") === "2"
+        ? 2
+        : 1;
+    } catch {
+      return 1;
+    }
+  });
+  const level2 = layoutPreset === "kds_ruko" && officeLevel === 2;
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
   const [hoverUid, setHoverUid] = useState<string | null>(null);
   const [drag, setDrag] = useState<DragState>({ kind: "idle" });
@@ -2664,6 +2676,22 @@ export function RetroOffice3D({
     () => ({ pos: CAM_POS, target: cameraTarget, zoom: cameraZoom }),
     [CAM_POS, cameraTarget, cameraZoom]
   );
+  // Preset kamera LT.2: target dipusatkan ke tengah bangunan dan zoom diperlebar
+  // agar seluruh 30 m Lantai 2 (termasuk Kamar 1-2 di ujung belakang) terlihat.
+  const lantai2Preset = useMemo(() => {
+    const [cx, , cz] = toWorld(
+      KDS_ORIGIN_X + KDS_RUKO_WIDTH / 2,
+      KDS_ORIGIN_Y + KDS_RUKO_DEPTH / 2,
+    );
+    const ox = DISTRICT_CAMERA_POSITION[0] - DISTRICT_CAMERA_TARGET[0];
+    const oy = DISTRICT_CAMERA_POSITION[1] - DISTRICT_CAMERA_TARGET[1];
+    const oz = DISTRICT_CAMERA_POSITION[2] - DISTRICT_CAMERA_TARGET[2];
+    return {
+      pos: [cx + ox, KDS_STORY + oy, cz + oz] as [number, number, number],
+      target: [cx, KDS_STORY, cz] as [number, number, number],
+      zoom: 36,
+    };
+  }, []);
   const canvasResetKey = useMemo(
     () =>
       [
@@ -5294,9 +5322,9 @@ export function RetroOffice3D({
               color="#7090ff"
             />
 
-            {/* Floor + walls — always visible, no async loading. */}
+            {/* L1: cangkang luar (dinding + fasad) & lingkungan tetap tampil saat LT.2; hanya interior yang disembunyikan. */}
             {layoutPreset === "kds_ruko" ? (
-              <KdsRukoScene />
+              <KdsRukoScene showInterior={!level2} />
             ) : (
               <>
                 <SceneFloorAndWalls showRemoteOffice={remoteOfficeEnabled} />
@@ -5311,6 +5339,7 @@ export function RetroOffice3D({
               <Environment preset="city" />
             </Suspense>
 
+            <group visible={!level2}>
             {/* Furniture models — each loads its GLB asynchronously. */}
             <Suspense fallback={null}>
               {!editMode ? (
@@ -5891,9 +5920,11 @@ export function RetroOffice3D({
               />
             ) : null}
 
+            </group>
+            {level2 ? <KdsLantai2Scene /> : null}
             {/* Floor raycaster for edit-mode interaction. */}
             <SceneFloorRaycaster
-              enabled={editMode}
+              enabled={editMode && !level2}
               onMove={handleFloorMove}
               onClick={handleFloorClick}
             />
@@ -5935,6 +5966,28 @@ export function RetroOffice3D({
                 {icon}
               </button>
             ))}
+            {layoutPreset === "kds_ruko" ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const next = officeLevel === 1 ? 2 : 1;
+                  setOfficeLevel(next);
+                  try {
+                    window.localStorage.setItem("kds:office-level", String(next));
+                  } catch {}
+                  if (next === 2) {
+                    setEditMode(false);
+                    cameraPresetRef.current = lantai2Preset;
+                  } else {
+                    cameraPresetRef.current = overviewPreset;
+                  }
+                }}
+                className="w-7 h-7 flex items-center justify-center rounded-md bg-[#1c1610]/80 text-amber-200/80 border border-amber-900/20 hover:bg-[#2a1e14] hover:text-amber-200 backdrop-blur-sm transition-colors text-[9px] font-mono"
+                title={officeLevel === 2 ? "Ke Lantai 1" : "Ke Lantai 2"}
+              >
+                {officeLevel === 2 ? "LT.1" : "LT.2"}
+              </button>
+            ) : null}
           </div>
           {standupMeeting ? (
             <button
