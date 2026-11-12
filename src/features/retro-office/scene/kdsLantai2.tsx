@@ -151,6 +151,18 @@ const L2_WALL_H = KDS_FLOOR_HEIGHT;
 const ROOM_WALL_H = 2.2;
 // Skala tinggi nyata untuk benda yang menempel/berdiri di dinding (1 m = 58 x 0,018 satuan dunia).
 const fm = (meters: number) => meters * M * SCALE;
+// Dinding kamar mandi/toilet yang menghadap kamera: tembok bawah ±1 m + kaca buram di atasnya sampai
+// ROOM_WALL_H, sehingga tetap setinggi dinding kamar tetapi isi (kloset, bak mandi, shower) terlihat.
+function GlassTopWall({ x, y, w, d }: { x: number; y: number; w: number; d: number }) {
+  return (
+    <group>
+      <Box x={x} y={y} w={w} d={d} h={1.05} color={WALL} />
+      <Box x={x} y={y} w={w} d={d} z0={1.05} h={ROOM_WALL_H - 1.05} color="#dbeafe" opacity={0.28} />
+      <Box x={x} y={y} w={w} d={d} z0={ROOM_WALL_H - 0.03} h={0.03} color="#cbd5e1" />
+    </group>
+  );
+}
+
 function L2Walls() {
   const mullions: ReactNode[] = [];
   for (let mx = 8; mx <= W - 8; mx += M) {
@@ -174,18 +186,18 @@ function L2Walls() {
       <Box x={-8} y={D - 6} w={W + 16} d={6} z0={L2_WALL_H - 0.12} h={0.12} color={WALL} />
 
       {/* Partisi KM <-> laundry. */}
-      <Box x={0} y={192} w={116} d={8} h={ROOM_WALL_H} color={WALL} />
+      <GlassTopWall x={0} y={192} w={116} d={8} />
 
       {/* Partisi KM/laundry <-> hall (x 116..124) + bukaan pintu KM & laundry. */}
-      <Box x={116} y={0} w={8} d={96} h={ROOM_WALL_H} color={WALL} />
-      <Box x={116} y={142} w={8} d={104} h={ROOM_WALL_H} color={WALL} />
-      <Box x={116} y={292} w={8} d={38} h={ROOM_WALL_H} color={WALL} />
+      <GlassTopWall x={116} y={0} w={8} d={96} />
+      <GlassTopWall x={116} y={142} w={8} d={104} />
+      <GlassTopWall x={116} y={292} w={8} d={38} />
 
       {/* Partisi hall <-> tangga (x 234..240) + bukaan landing y 0..70. */}
       <Box x={234} y={70} w={6} d={260} h={1.05} color={WALL} />
 
       {/* Partisi belakang <-> hall penghubung (y 330) + bukaan hall. */}
-      <Box x={0} y={330} w={124} d={6} h={ROOM_WALL_H} color={WALL} />
+      <GlassTopWall x={0} y={330} w={124} d={6} />
       <Box x={234} y={330} w={114} d={6} h={1.05} color={WALL} />
 
       {/* Partisi hall penghubung <-> koridor/kamar (y 420) + bukaan koridor. */}
@@ -258,6 +270,21 @@ function L2BathLaundry() {
       <Box x={71} y={151} w={22} d={30} z0={T + mz(0.4)} h={0.015} color="#e2e8f0" />
       {/* Handuk tergantung di dinding barat */}
       <Box x={0} y={78} w={3} d={26} z0={T + fm(1.1)} h={fm(0.5)} color="#f472b6" />
+
+      {/* TOILET (ruang kedua, x 0..116, y 200..330; pintu x 116, y 246..292) — kloset duduk seperti referensi
+          pemilik: tangki menempel dinding utara, tisu gulung di atas tangki, tempat sampah & tempat sikat,
+          keset oranye di depan kloset, handuk krem tergantung. */}
+      <Box x={0} y={200} w={116} d={130} z0={T} h={0.003} color="#eef2f5" />
+      <Box x={50} y={200} w={30} d={12} z0={T} h={mz(0.85)} color={WHITE} />
+      <Box x={49} y={199} w={32} d={14} z0={T + mz(0.85)} h={0.012} color="#e2e8f0" />
+      <Box x={60} y={202} w={10} d={10} z0={T + mz(0.85) + 0.012} h={0.06} color="#ffffff" />
+      <Box x={56} y={212} w={18} d={18} z0={T} h={mz(0.38)} color={WHITE} />
+      <Box x={53} y={212} w={24} d={30} z0={T + mz(0.38)} h={0.03} color={WHITE} />
+      <Box x={54} y={213} w={22} d={28} z0={T + mz(0.38) + 0.03} h={0.012} color="#f1f5f9" />
+      <Box x={30} y={206} w={14} d={14} z0={T} h={mz(0.35)} color="#f8fafc" />
+      <Box x={86} y={206} w={8} d={8} z0={T} h={mz(0.4)} color="#e5e7eb" />
+      <Box x={46} y={250} w={38} d={22} z0={T + 0.004} h={0.006} color="#c97a1e" />
+      <Box x={100} y={200} w={14} d={3} z0={T + fm(0.7)} h={fm(0.75)} color="#e6c9a3" />
 
       {/* Wastafel di hall, di luar pintu kamar mandi (menempel muka timur partisi x 124) */}
       <Box x={124} y={150} w={22} d={38} z0={T} h={mz(0.8)} color="#d6c4a8" />
@@ -342,8 +369,8 @@ function L2Signage() {
       <WallPlaque x={142} y={577} z={0.78} text="KAMAR 2" />
       <WallPlaque x={142} y={734} z={0.78} text="KAMAR 3" />
       <WallPlaque x={142} y={891} z={0.78} text="KAMAR 4" />
-      <WallPlaque x={58} y={0} z={0.78} text="KAMAR MANDI" />
-      <WallPlaque x={58} y={200} z={0.78} text="LAUNDRY" />
+      <WallPlaque x={124} y={70} z={0.8} text="KAMAR MANDI" face="east" />
+      <WallPlaque x={124} y={312} z={0.8} text="TOILET" face="east" />
       <WallPlaque x={240} y={120} z={0.78} text="TANGGA KE LT.1" face="east" />
       <WallPlaque x={240} y={250} z={0.78} text="LANTAI 2" face="east" />
       <WallPlaque x={200} y={1048} z={0.78} text="RUANG MAKAN" />
