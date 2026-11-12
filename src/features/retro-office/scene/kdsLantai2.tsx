@@ -18,6 +18,7 @@ import {
   SLAB_TOP,
   kamarPieces,
 } from "@/features/retro-office/scene/kdsKamarLayout";
+import { makanPieces } from "@/features/retro-office/scene/kdsMakanLayout";
 
 // Lantai 2 Kantor AI KDS — scene dasar (KAN-6).
 // Zonasi & koordinat mengacu KAN-5 (denah disetujui owner). Semua koordinat lokal ruko
@@ -273,9 +274,31 @@ function L2Signage() {
       <Sign x={118} y={119} z={0.62} text="KAMAR MANDI" width={panelWidth(11)} />
       <Sign x={118} y={269} z={0.62} text="LAUNDRY" width={panelWidth(7)} />
       <Sign x={58} y={1060} z={0.7} text="RUANG MAKAN" width={panelWidth(11)} />
+      <Sign x={300} y={1062} z={0.98} text="PANTRY" width={panelWidth(6)} />
       <Sign x={174} y={1410} z={0.82} text="RUANG ISTIRAHAT" width={panelWidth(15)} />
       <Sign x={237} y={35} z={0.75} text="TANGGA KE LANTAI 1" size={0.16} height={0.24} width={panelWidth(18, 0.16)} />
       <Sign x={237} y={90} z={0.75} text="LANTAI 2" width={panelWidth(8)} />
+    </group>
+  );
+}
+
+// Ruang makan + pantry (KAN-8): geometri kotak sederhana, tanpa bayangan.
+function L2Makan() {
+  return (
+    <group>
+      {makanPieces().map((p) => (
+        <Box
+          key={`makan-${p.id}`}
+          x={p.x}
+          y={p.y}
+          w={p.w}
+          d={p.d}
+          z0={SLAB_TOP + p.z0}
+          h={p.h}
+          color={p.color}
+          emissive={p.emissive}
+        />
+      ))}
     </group>
   );
 }
@@ -316,6 +339,7 @@ export const KdsLantai2Scene = memo(function KdsLantai2Scene() {
       <L2Stairs />
       <L2BathLaundry />
       <L2Kamar />
+      <L2Makan />
       <L2Signage />
       <L2Lights />
     </group>
