@@ -20,6 +20,7 @@ import {
 } from "@/features/retro-office/scene/kdsKamarLayout";
 import { makanPieces } from "@/features/retro-office/scene/kdsMakanLayout";
 import { KdsOffDutyStaff } from "@/features/retro-office/scene/kdsOffDuty";
+import { AquaDispenser } from "@/features/retro-office/objects/aquaDispenser";
 import { FACADE_GLASS, loungePieces } from "@/features/retro-office/scene/kdsLoungeLayout";
 
 // Lantai 2 Kantor AI KDS — scene dasar (KAN-6).
@@ -384,7 +385,11 @@ function L2Signage() {
 function L2Makan() {
   return (
     <group>
-      {makanPieces().map((p) => (
+      {/* Dispenser + galon AQUA menempel dinding barat ruang makan, menghadap timur (ke kamera). */}
+      <group position={toWorld(10, 1340).map((v, i) => (i === 1 ? SLAB_TOP : v)) as [number, number, number]} rotation={[0, Math.PI / 2, 0]}>
+        <AquaDispenser />
+      </group>
+      {makanPieces().filter((p) => !p.id.startsWith("dispenser")).map((p) => (
         <Box
           key={`makan-${p.id}`}
           x={p.x}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useGLTF } from "@react-three/drei";
+import { AquaDispenser } from "@/features/retro-office/objects/aquaDispenser";
 import type { ThreeEvent } from "@react-three/fiber";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -518,9 +519,14 @@ export function FurnitureModel({
       }}
     >
       <group position={[pivotX, 0, pivotZ]} rotation={[0, rotY, 0]}>
-        <group position={[-pivotX, 0, -pivotZ]} scale={scale}>
-          <primitive object={cloned} />
-        </group>
+        {itemType === "water_cooler" ? (
+          // Dispenser + galon AQUA (permintaan pemilik), menggantikan model GLB generik.
+          <AquaDispenser />
+        ) : (
+          <group position={[-pivotX, 0, -pivotZ]} scale={scale}>
+            <primitive object={cloned} />
+          </group>
+        )}
         {itemType === "kanban_board" ? (
           <>
             {kanbanTaskCount > 0 ? (
