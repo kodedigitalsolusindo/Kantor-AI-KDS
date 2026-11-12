@@ -815,11 +815,12 @@ function Street() {
         <Box x={318} y={yApron + 77} w={124} d={4} z0={1.31} h={0.24} color="#0d3b8c" />
         <Box x={318} y={yApron + 77} w={124} d={4} z0={1.31} h={0.035} color="#d32f2f" />
         <Label x={380} y={yApron + 82} z={1.44} text="BUS MEBIDANG" size={0.11} />
-        <Pole x={490} y={yApron + 86} h={1.7} r={0.025} color="#2b6cd4" />
-        <Box x={475} y={yApron + 82} w={32} d={3} z0={1.48} h={0.24} color="#1e5bb8" />
-        <Label x={491} y={yApron + 85} z={1.6} text="STOP" size={0.07} />
-        <Box x={475} y={yApron + 82} w={32} d={3} z0={1.3} h={0.14} color="#f2f2f2" />
-        <Label x={491} y={yApron + 85} z={1.37} text="HALTE" size={0.05} color={NAVY} />
+        {/* Rambu halte: tiang di BELAKANG papan (sisi bangunan) agar tulisan STOP/HALTE tidak terpotong tiang */}
+        <Pole x={491} y={yApron + 82} h={1.7} r={0.025} color="#2b6cd4" />
+        <Box x={475} y={yApron + 85} w={32} d={3} z0={1.48} h={0.24} color="#1e5bb8" />
+        <Label x={491} y={yApron + 89} z={1.6} text="STOP" size={0.07} />
+        <Box x={475} y={yApron + 85} w={32} d={3} z0={1.3} h={0.14} color="#f2f2f2" />
+        <Label x={491} y={yApron + 89} z={1.37} text="HALTE" size={0.05} color={NAVY} />
       </group>
 
       {/* Pohon peneduh (tiang listrik & kabel dihapus atas permintaan pemilik, 2026-11-12) */}
