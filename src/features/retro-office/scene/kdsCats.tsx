@@ -8,15 +8,17 @@ import { toWorld } from "@/features/retro-office/core/geometry";
 
 // Dua kucing kantor KDS yang berkeliaran dari lobi sampai ruang kerja mengikuti graf jalur
 // (koordinat kanvas lokal ruko, sama dengan KDS_RUKO_LOCAL). Celah antar-meja (x 117 & 231)
-// cukup untuk kucing menyelinap di antara baris meja.
+// cukup untuk kucing menyelinap di antara baris meja. Sejak 2026-11-12 kucing bebas naik tangga
+// (x 240..342, y 24..330) ke Lantai 2: hall servis, koridor, kamar, ruang makan, dan lounge.
 
-type Node = { x: number; y: number };
+// level: 1 = Lantai 1, 2 = Lantai 2, 1.5 = di anak tangga (step = indeks anak tangga 0..8).
+type Node = { x: number; y: number; level: 1 | 1.5 | 2; step?: number };
 
 function buildGraph() {
   const nodes: Node[] = [];
   const edges = new Map<number, Set<number>>();
-  const add = (x: number, y: number) => {
-    nodes.push({ x, y });
+  const add = (x: number, y: number, level: 1 | 1.5 | 2 = 1, step?: number) => {
+    nodes.push({ x, y, level, step });
     edges.set(nodes.length - 1, new Set());
     return nodes.length - 1;
   };
@@ -58,6 +60,47 @@ function buildGraph() {
   link(grid[0][2], p0);
   link(p0, p1);
   link(p1, p2);
+
+  // Tangga ke Lantai 2: kaki tangga di depan anak tangga pertama, lalu 9 anak tangga naik ke belakang.
+  const sBase = add(290, 345);
+  link(p0, sBase);
+  let prevStep = sBase;
+  for (let i = 0; i < 9; i += 1) {
+    const st = add(290, 330 - (i + 0.5) * 34, 1.5, i);
+    link(prevStep, st);
+    prevStep = st;
+  }
+  // Lantai 2: ambang landing -> hall servis -> hall penghubung -> koridor -> kamar / ruang makan / lounge.
+  const L2 = (x: number, y: number) => add(x, y, 2);
+  const h0 = L2(232, 40);
+  const h1 = L2(179, 60);
+  const h2 = L2(179, 200);
+  const h3 = L2(179, 375);
+  const h4 = L2(58, 380);
+  link(prevStep, h0);
+  [[h0, h1], [h1, h2], [h2, h3], [h3, h4]].forEach(([a, b]) => link(a, b));
+  const corridor = [455, 612, 769, 926, 1020].map((cy) => L2(58, cy));
+  link(h4, corridor[0]);
+  for (let i = 0; i < corridor.length - 1; i += 1) link(corridor[i], corridor[i + 1]);
+  // Masuk kamar lewat pintu (x 116..122) ke sisi barat bunk bed.
+  [455, 612, 769, 926].forEach((cy, i) => {
+    const door = L2(119, cy);
+    const room = L2(190, cy + 20);
+    link(corridor[i], door);
+    link(door, room);
+  });
+  // Ruang makan (sisi barat meja) -> pantry -> lounge.
+  const m1 = L2(55, 1110);
+  const m2 = L2(55, 1260);
+  const m3 = L2(260, 1300);
+  const m4 = L2(270, 1120);
+  link(corridor[corridor.length - 1], m1);
+  [[m1, m2], [m2, m3], [m3, m4]].forEach(([a, b]) => link(a, b));
+  const l1 = L2(200, 1450);
+  const l2 = L2(270, 1560);
+  const l3 = L2(80, 1470);
+  const l4 = L2(230, 1650);
+  [[m3, l1], [l1, l2], [l1, l3], [l2, l4]].forEach(([a, b]) => link(a, b));
   return { nodes, edges };
 }
 
@@ -77,7 +120,7 @@ type CatState = {
 const SPEED = 30; // satuan kanvas per detik (±0,5 m/s)
 
 function useCatWalker(startNode: number, seed: number) {
-  const graph = useMemo(buildGraph, []);
+  const graph = useMemo(() => buildGraph(), []);
   const state = useRef<CatState>({
     from: startNode,
     to: [...graph.edges.get(startNode)!][0],
@@ -134,7 +177,8 @@ function useCatWalker(startNode: number, seed: number) {
       diff = Math.atan2(Math.sin(diff), Math.cos(diff));
       s.heading += diff * Math.min(1, dt * 6);
     }
-    return { x, y, ...s };
+    const levelOf = Math.max(a.level, b.level);
+    return { x, y, a, b, tt: t, levelOf, ...s };
   };
   return step;
 }
@@ -149,7 +193,27 @@ type Look = {
 const BRITISH: Look = { fur: "#8d98a5", furDark: "#76818e", eye: "#e0862a", long: false };
 const PERSIAN: Look = { fur: "#151515", furDark: "#0a0a0a", eye: "#d9822b", long: true };
 
-function Cat({ look, startNode, seed, scale = 1 }: { look: Look; startNode: number; seed: number; scale?: number }) {
+type CatView = { view: 1 | 2; floorH: number; rise: number };
+
+function nodeZ(n: Node, v: CatView) {
+  if (n.level === 2) return v.floorH;
+  if (n.level === 1.5) return ((n.step ?? 0) + 1) * v.rise;
+  return 0;
+}
+
+function Cat({
+  look,
+  startNode,
+  seed,
+  scale = 1,
+  cv,
+}: {
+  look: Look;
+  startNode: number;
+  seed: number;
+  scale?: number;
+  cv: CatView;
+}) {
   const step = useCatWalker(startNode, seed);
   const root = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
@@ -163,7 +227,10 @@ function Cat({ look, startNode, seed, scale = 1 }: { look: Look; startNode: numb
     const g = root.current;
     if (!g) return;
     const [wx, , wz] = toWorld(s.x, s.y);
-    g.position.set(wx, 0, wz);
+    const z = nodeZ(s.a, cv) + (nodeZ(s.b, cv) - nodeZ(s.a, cv)) * s.tt;
+    g.position.set(wx, z, wz);
+    // LT.1: kucing di Lantai 2 disembunyikan; LT.2: hanya kucing di tangga/Lantai 2 yang tampil.
+    g.visible = cv.view === 1 ? s.levelOf < 2 : s.levelOf >= 1.5;
     g.rotation.y = s.heading;
     const walking = s.mode === "walk";
     const gait = walking ? Math.sin(s.phase * 9) : 0;
@@ -285,11 +352,19 @@ function Cat({ look, startNode, seed, scale = 1 }: { look: Look; startNode: numb
   );
 }
 
-export function KdsCats() {
+// Indeks node lounge Lantai 2 (start kucing kedua) dicari dari graf agar tidak bergantung urutan.
+const L2_START = (() => {
+  const g = buildGraph();
+  const i = g.nodes.findIndex((n) => n.level === 2 && n.x === 200 && n.y === 1450);
+  return i >= 0 ? i : 10;
+})();
+
+export function KdsCats({ view = 1, floorH = 0, rise = 0.11 }: { view?: 1 | 2; floorH?: number; rise?: number }) {
+  const cv = { view, floorH, rise };
   return (
     <group>
-      <Cat look={BRITISH} startNode={0} seed={1.3} scale={1.35} />
-      <Cat look={PERSIAN} startNode={10} seed={4.1} scale={1.35} />
+      <Cat look={BRITISH} startNode={0} seed={1.3} scale={1.35} cv={cv} />
+      <Cat look={PERSIAN} startNode={L2_START} seed={4.1} scale={1.35} cv={cv} />
     </group>
   );
 }

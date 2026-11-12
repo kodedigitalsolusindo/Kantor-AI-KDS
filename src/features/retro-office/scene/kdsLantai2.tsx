@@ -19,6 +19,7 @@ import {
   kamarPieces,
 } from "@/features/retro-office/scene/kdsKamarLayout";
 import { makanPieces } from "@/features/retro-office/scene/kdsMakanLayout";
+import { KdsOffDutyStaff } from "@/features/retro-office/scene/kdsOffDuty";
 import { FACADE_GLASS, loungePieces } from "@/features/retro-office/scene/kdsLoungeLayout";
 
 // Lantai 2 Kantor AI KDS — scene dasar (KAN-6).
@@ -377,6 +378,8 @@ export const KdsLantai2Scene = memo(function KdsLantai2Scene() {
       <L2Lounge />
       <L2Signage />
       <L2Lights />
+      {/* 8 staf sedang istirahat: tidur, masak, cuci piring, makan, nonton TV, main HP */}
+      <KdsOffDutyStaff />
     </group>
   );
 });
