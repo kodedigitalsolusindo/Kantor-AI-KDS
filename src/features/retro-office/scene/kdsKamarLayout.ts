@@ -30,6 +30,8 @@ export type KamarPiece = {
 const WOOD = "#b58a5a";
 const MATTRESS = "#e8eef7";
 const m = (v: number) => v * Z_PER_M;
+// Skala tinggi nyata (1 m = 58 x 0,018 satuan dunia) untuk benda yang menempel di dinding penuh.
+const fm = (meters: number) => meters * 58 * 0.018;
 
 // Bunk bed 2,0 x 1,0 m (116 x 58), rapat dinding timur + utara kamar.
 const BX = 102;
@@ -68,10 +70,11 @@ export function kamarPieces(blanket: string): KamarPiece[] {
     { id: "chair-back", lx: 79, ly: 92, w: 23, d: 3, z0: m(0.42), h: m(0.4), color: "#0b1f3a" },
     { id: "chair-leg", lx: 88, ly: 101, w: 5, d: 5, z0: 0, h: m(0.42), color: "#333a44" },
     { id: "desk-lamp", lx: 68, ly: 120, w: 6, d: 6, z0: m(0.68) + 0.02, h: m(0.28), color: "#fff7d6", emissive: "#fff7d6" },
-    // AC dinding 0,9 x 0,25 m, tinggi (di atas kepala), dinding utara.
-    { id: "ac", lx: 40, ly: 0, w: 52, d: 14, z0: 0.62, h: 0.1, color: "#f8fafc" },
-    { id: "ac-vent", lx: 44, ly: 14, w: 44, d: 1, z0: 0.63, h: 0.025, color: "#94a3b8" },
-    { id: "ac-led", lx: 84, ly: 14, w: 3, d: 1, z0: 0.69, h: 0.012, color: "#38bdf8", emissive: "#38bdf8" },
+    // AC dinding 0,9 x 0,3 m setinggi ±2,2 m (skala tinggi nyata), di dinding luar timur yang setinggi
+    // lantai penuh, di atas kepala tempat tidur; kisi & LED menghadap ke dalam kamar.
+    { id: "ac", lx: 210, ly: 70, w: 14, d: 52, z0: fm(2.2), h: fm(0.3), color: "#cfd8e3" },
+    { id: "ac-vent", lx: 209, ly: 74, w: 1, d: 44, z0: fm(2.24), h: fm(0.06), color: "#475569" },
+    { id: "ac-led", lx: 209, ly: 116, w: 1, d: 3, z0: fm(2.44), h: fm(0.03), color: "#38bdf8", emissive: "#38bdf8" },
   ];
 }
 

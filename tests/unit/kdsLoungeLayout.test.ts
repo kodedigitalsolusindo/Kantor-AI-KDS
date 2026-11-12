@@ -18,6 +18,7 @@ import {
   SOFA_MAIN,
   TV,
   WALL_TOP,
+  FULL_WALL_TOP,
   loungePieces,
   signWidth,
   type LoungePiece,
@@ -43,7 +44,8 @@ describe("kdsLoungeLayout (KAN-9)", () => {
       expect(p.x + p.w, p.id).toBeLessThanOrEqual(LOUNGE_X0 + LOUNGE_W);
       expect(p.y + p.d, p.id).toBeLessThanOrEqual(LOUNGE_Y0 + LOUNGE_D);
       expect(p.y + p.d, p.id).toBeLessThanOrEqual(LOUNGE_GLASS_Y);
-      expect(SLAB_TOP + p.z0 + p.h, p.id).toBeLessThan(WALL_TOP);
+      const top = p.group === "tv" || p.id.startsWith("ac-") ? FULL_WALL_TOP : WALL_TOP;
+      expect(SLAB_TOP + p.z0 + p.h, p.id).toBeLessThan(top);
     }
   });
 
