@@ -105,14 +105,13 @@ function Sign({
         <boxGeometry args={[width * SCALE, height, 0.05]} />
         <meshStandardMaterial color={NAVY} roughness={0.6} />
       </mesh>
+      {/* Teks satu baris (tanpa maxWidth agar tidak membungkus), sedikit di depan panel. */}
       <Text
         position={[0, 0, 0.05]}
         fontSize={size}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        maxWidth={width * SCALE * 0.9}
-        textAlign="center"
         outlineWidth={size * 0.09}
         outlineColor="#ffffff"
       >
@@ -122,10 +121,11 @@ function Sign({
   );
 }
 
-// Perkiraan lebar panel (satuan lokal) agar teks mengisi ~85% lebar papan.
-// charW ≈ 0.6 × fontSize; panelWorld = textWorld / 0.85; lalu / SCALE ke satuan lokal.
+// Lebar panel (satuan lokal) = perkiraan lebar teks + padding kiri-kanan.
+// charW ≈ 0.75 × fontSize (cukup longgar untuk huruf kapital + outline bold);
+// padding 0.18 m total (0.09 m per sisi) agar teks tidak keluar dari papan.
 function panelWidth(chars: number, size = 0.22) {
-  return Math.round((chars * 0.6 * size) / 0.85 / SCALE);
+  return Math.round((chars * 0.75 * size + 0.18) / SCALE);
 }
 
 // Pelat lantai per zona (bukan satu slab) — void tangga x240..342, y0..330 wajib terbuka.

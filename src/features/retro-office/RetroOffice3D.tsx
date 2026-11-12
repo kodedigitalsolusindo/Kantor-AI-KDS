@@ -2689,7 +2689,7 @@ export function RetroOffice3D({
     return {
       pos: [cx + ox, KDS_STORY + oy, cz + oz] as [number, number, number],
       target: [cx, KDS_STORY, cz] as [number, number, number],
-      zoom: 38,
+      zoom: 36,
     };
   }, []);
   const canvasResetKey = useMemo(
