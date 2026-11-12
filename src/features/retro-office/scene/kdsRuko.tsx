@@ -30,7 +30,8 @@ const TEAL = "#16a596";
 const TEAL_DARK = "#0f7f74";
 const NAVY = "#0b1f3a";
 const BLUE = "#2563eb";
-const STORY = 1.05;
+export const KDS_STORY = 1.05;
+const STORY = KDS_STORY;
 
 type BoxProps = {
   x: number;

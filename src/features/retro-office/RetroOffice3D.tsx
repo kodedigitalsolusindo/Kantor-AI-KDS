@@ -94,6 +94,7 @@ import {
   type OfficeLayoutPreset,
 } from "@/features/retro-office/core/furnitureDefaults";
 import { KdsRukoScene } from "@/features/retro-office/scene/kdsRuko";
+import { KdsLantai2Scene } from "@/features/retro-office/scene/kdsLantai2";
 import { ImacModel } from "@/features/retro-office/objects/imac";
 import { ReceptionDeskModel } from "@/features/retro-office/objects/reception";
 import { MeetingTableModel } from "@/features/retro-office/objects/meetingTable";
@@ -2551,6 +2552,17 @@ export function RetroOffice3D({
     [defaultRemoteLayoutFurniture, remoteLayoutSnapshot, remoteOfficeEnabled],
   );
   const [editMode, setEditMode] = useState(false);
+  const [officeLevel, setOfficeLevel] = useState<1 | 2>(() => {
+    try {
+      return typeof window !== "undefined" &&
+        window.localStorage.getItem("kds:office-level") === "2"
+        ? 2
+        : 1;
+    } catch {
+      return 1;
+    }
+  });
+  const level2 = layoutPreset === "kds_ruko" && officeLevel === 2;
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
   const [hoverUid, setHoverUid] = useState<string | null>(null);
   const [drag, setDrag] = useState<DragState>({ kind: "idle" });
@@ -5311,6 +5323,7 @@ export function RetroOffice3D({
               <Environment preset="city" />
             </Suspense>
 
+            <group visible={!level2}>
             {/* Furniture models — each loads its GLB asynchronously. */}
             <Suspense fallback={null}>
               {!editMode ? (
@@ -5891,9 +5904,11 @@ export function RetroOffice3D({
               />
             ) : null}
 
+            </group>
+            {level2 ? <KdsLantai2Scene /> : null}
             {/* Floor raycaster for edit-mode interaction. */}
             <SceneFloorRaycaster
-              enabled={editMode}
+              enabled={editMode && !level2}
               onMove={handleFloorMove}
               onClick={handleFloorClick}
             />
@@ -5935,6 +5950,32 @@ export function RetroOffice3D({
                 {icon}
               </button>
             ))}
+            {layoutPreset === "kds_ruko" ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const next = officeLevel === 1 ? 2 : 1;
+                  setOfficeLevel(next);
+                  try {
+                    window.localStorage.setItem("kds:office-level", String(next));
+                  } catch {}
+                  if (next === 2) {
+                    setEditMode(false);
+                    cameraPresetRef.current = {
+                      pos: [CAM_POS[0], CAM_POS[1] + 1.6, CAM_POS[2]],
+                      target: [cameraTarget[0], cameraTarget[1] + 1.05, cameraTarget[2]],
+                      zoom: 52,
+                    };
+                  } else {
+                    cameraPresetRef.current = overviewPreset;
+                  }
+                }}
+                className="w-7 h-7 flex items-center justify-center rounded-md bg-[#1c1610]/80 text-amber-200/80 border border-amber-900/20 hover:bg-[#2a1e14] hover:text-amber-200 backdrop-blur-sm transition-colors text-[9px] font-mono"
+                title={officeLevel === 2 ? "Ke Lantai 1" : "Ke Lantai 2"}
+              >
+                {officeLevel === 2 ? "LT.1" : "LT.2"}
+              </button>
+            ) : null}
           </div>
           {standupMeeting ? (
             <button
