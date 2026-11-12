@@ -30,8 +30,19 @@ const TEAL = "#16a596";
 const TEAL_DARK = "#0f7f74";
 const NAVY = "#0b1f3a";
 const BLUE = "#2563eb";
+// Tinggi dinding cutaway tampilan LT.1 (skala vertikal stilisasi Claw3D). Jangan diubah:
+// tampilan Lantai 1 harus identik.
 export const KDS_STORY = 1.05;
 const STORY = KDS_STORY;
+// Tinggi satu lantai nyata ruko (3,0 m) dalam satuan dunia, skala horizontal yang sama
+// (1 m = KDS_UNITS_PER_METER × SCALE). Dipakai saat LT.2: pelat Lantai 2 berada di ketinggian
+// ini dan cangkang luar Lantai 1 tampil setinggi satu lantai penuh.
+export const KDS_FLOOR_HEIGHT_M = 3.0;
+export const KDS_FLOOR_HEIGHT = KDS_FLOOR_HEIGHT_M * KDS_UNITS_PER_METER * SCALE;
+const FLOOR_H = KDS_FLOOR_HEIGHT;
+// Proporsi fasad saat tampil setinggi satu lantai penuh (LT.2).
+const TALL_STORE_H = 2.0; // tinggi kaca etalase/pintu lipat
+const TALL_SIGN_Z = 2.35; // dasar papan nama, papan berakhir ±0,5 di atasnya (di bawah pelat L2)
 
 type BoxProps = {
   x: number;
@@ -271,6 +282,7 @@ function RukoNeighbor({
   sign,
   shopfront,
   terrace,
+  tall = false,
 }: {
   x: number;
   baseColor: string;
@@ -278,23 +290,28 @@ function RukoNeighbor({
   sign: string;
   shopfront: "glass" | "rolling";
   terrace?: string;
+  tall?: boolean;
 }) {
   const w = NEIGHBOR_W;
+  // tall (LT.2): tetangga setinggi satu lantai penuh agar sejajar cangkang ruko KDS.
+  const k = tall ? TALL_STORE_H / 0.82 : 1;
+  const storeH = 0.82 * k;
+  const signZ = tall ? TALL_SIGN_Z : 0.92;
   return (
     <group>
-      <Box x={x} y={0} w={w} d={D} h={STORY} color={baseColor} />
+      <Box x={x} y={0} w={w} d={D} h={tall ? FLOOR_H : STORY} color={baseColor} />
       {shopfront === "glass" ? (
-        <Box x={x + 20} y={D} w={w - 40} d={5} z0={0.06} h={0.82} color="#9fc3d1" opacity={0.6} />
+        <Box x={x + 20} y={D} w={w - 40} d={5} z0={0.06} h={storeH} color="#9fc3d1" opacity={0.6} />
       ) : (
         <>
-          <Box x={x + 20} y={D} w={w - 40} d={5} z0={0.06} h={0.82} color="#8d8f91" />
+          <Box x={x + 20} y={D} w={w - 40} d={5} z0={0.06} h={storeH} color="#8d8f91" />
           {[0.2, 0.35, 0.5, 0.65].map((z) => (
-            <Box key={z} x={x + 20} y={D + 5} w={w - 40} d={1} z0={z} h={0.01} color="#6f7173" />
+            <Box key={z} x={x + 20} y={D + 5} w={w - 40} d={1} z0={z * k} h={0.01} color="#6f7173" />
           ))}
         </>
       )}
-      <Box x={x + 10} y={D + 2} w={w - 20} d={8} z0={0.92} h={0.3} color={accent} />
-      <Label x={x + w / 2} y={D + 11} z={1.07} text={sign} size={0.12} />
+      <Box x={x + 10} y={D + 2} w={w - 20} d={8} z0={signZ} h={0.3} color={accent} />
+      <Label x={x + w / 2} y={D + 11} z={signZ + 0.15} text={sign} size={0.12} />
       {terrace ? <Box x={x} y={D} w={w} d={60} h={0.09} color={terrace} /> : null}
     </group>
   );
@@ -312,20 +329,23 @@ const TEAM_BY_ROW = [
 
 // Cangkang luar L1: lantai dasar + tangga ke L2 + dinding keliling (badan bangunan).
 // Tetap tampil saat LT.2 agar Lantai 2 tampak berdiri di atas ruko.
-function L1Shell() {
+// tall (LT.2): dinding keliling setinggi satu lantai penuh (3,0 m) dan tangga naik sampai pelat L2.
+function L1Shell({ tall = false }: { tall?: boolean }) {
+  const wallH = tall ? FLOOR_H : STORY;
+  const rise = tall ? FLOOR_H / 9 : 0.11;
   const stairs: ReactNode[] = [];
   for (let i = 0; i < 9; i += 1) {
     stairs.push(
-      <Box key={`st${i}`} x={240} y={330 - (i + 1) * 34} w={102} d={34} h={(i + 1) * 0.11} color={i % 2 ? "#cfc6b8" : "#c3b9a9"} />,
+      <Box key={`st${i}`} x={240} y={330 - (i + 1) * 34} w={102} d={34} h={(i + 1) * rise} color={i % 2 ? "#cfc6b8" : "#c3b9a9"} />,
     );
   }
   return (
     <group>
       <Box x={0} y={0} w={W} d={D} z0={-0.02} h={0.02} color="#eee8dc" />
       {stairs}
-      <Box x={-8} y={-8} w={W + 16} d={8} h={STORY} color="#f4f1ea" />
-      <Box x={-8} y={0} w={8} d={D} h={STORY} color="#f4f1ea" />
-      <Box x={W} y={0} w={8} d={D} h={STORY} color="#f4f1ea" />
+      <Box x={-8} y={-8} w={W + 16} d={8} h={wallH} color="#f4f1ea" />
+      <Box x={-8} y={0} w={8} d={D} h={wallH} color="#f4f1ea" />
+      <Box x={W} y={0} w={8} d={D} h={wallH} color="#f4f1ea" />
     </group>
   );
 }
@@ -422,39 +442,45 @@ function Interior() {
   );
 }
 
-function Facade() {
+// tall (LT.2): fasad setinggi satu lantai penuh — etalase/pintu ±2 m, papan nama tepat di bawah
+// pelat Lantai 2, dinding depan ditutup sampai KDS_FLOOR_HEIGHT. Default = tampilan LT.1 (tidak berubah).
+function Facade({ tall = false }: { tall?: boolean }) {
+  const storeH = tall ? TALL_STORE_H : 0.92;
+  const SZ = tall ? TALL_SIGN_Z : STORY;
   const mullions: ReactNode[] = [];
   for (let mx = 0; mx <= W; mx += M) {
     if (mx > 125 && mx < 220) continue;
-    mullions.push(<Box key={`m${mx}`} x={Math.min(mx, W - 6)} y={D - 2} w={6} d={10} z0={0.05} h={0.92} color={TEAL} />);
+    mullions.push(<Box key={`m${mx}`} x={Math.min(mx, W - 6)} y={D - 2} w={6} d={10} z0={0.05} h={storeH} color={TEAL} />);
   }
   return (
     <group>
       <Box x={0} y={D - 4} w={W} d={12} h={0.06} color="#d7ccc8" />
-      <Box x={0} y={D} w={140} d={4} z0={0.05} h={0.92} color="#24343d" opacity={0.42} />
-      <Box x={208} y={D} w={140} d={4} z0={0.05} h={0.92} color="#24343d" opacity={0.42} />
+      <Box x={0} y={D} w={140} d={4} z0={0.05} h={storeH} color="#24343d" opacity={0.42} />
+      <Box x={208} y={D} w={140} d={4} z0={0.05} h={storeH} color="#24343d" opacity={0.42} />
       {mullions}
-      <Box x={0} y={D - 2} w={W} d={10} z0={0.95} h={0.06} color={TEAL_DARK} />
+      <Box x={0} y={D - 2} w={W} d={10} z0={storeH + 0.03} h={0.06} color={TEAL_DARK} />
+      {/* Dinding depan di atas etalase sampai pelat L2 (hanya tampilan LT.2). */}
+      {tall ? <Box x={0} y={D - 6} w={W} d={6} z0={storeH + 0.09} h={FLOOR_H - storeH - 0.09} color="#f4f1ea" /> : null}
       {/* Pintu lipat hijau-teal (ciri ruko KDS) terlipat di kedua sisi pintu kaca */}
       {[124, 132, 208, 216].map((px, i) => (
-        <Box key={`f${px}`} x={px} y={D + 2} w={8} d={14} z0={0.05} h={0.92} color={i % 2 ? TEAL_DARK : TEAL} />
+        <Box key={`f${px}`} x={px} y={D + 2} w={8} d={14} z0={0.05} h={storeH} color={i % 2 ? TEAL_DARK : TEAL} />
       ))}
-      <Box x={140} y={D + 2} w={68} d={3} z0={0.05} h={0.92} color="#bfe3df" opacity={0.25} />
+      <Box x={140} y={D + 2} w={68} d={3} z0={0.05} h={storeH} color="#bfe3df" opacity={0.25} />
 
       {/* Papan nama: panel ACP navy + huruf timbul akrilik backlit LED */}
-      <Box x={0} y={D} w={W} d={14} z0={STORY} h={0.5} color="#f7f7f2" />
-      <Box x={8} y={D + 14} w={W - 16} d={5} z0={STORY + 0.04} h={0.42} color={NAVY} />
-      <KdsLogoIcon x={34} y={D + 21} z={STORY + 0.25} size={0.36} />
-      <Label x={200} y={D + 24} z={STORY + 0.3} text="KodeSolusindo" size={0.2} />
-      <Label x={200} y={D + 24} z={STORY + 0.12} text="PT KODE DIGITAL SOLUSINDO · SOFTWARE HOUSE" size={0.05} color="#60a5fa" />
+      <Box x={0} y={D} w={W} d={14} z0={SZ} h={0.5} color="#f7f7f2" />
+      <Box x={8} y={D + 14} w={W - 16} d={5} z0={SZ + 0.04} h={0.42} color={NAVY} />
+      <KdsLogoIcon x={34} y={D + 21} z={SZ + 0.25} size={0.36} />
+      <Label x={200} y={D + 24} z={SZ + 0.3} text="KodeSolusindo" size={0.2} />
+      <Label x={200} y={D + 24} z={SZ + 0.12} text="PT KODE DIGITAL SOLUSINDO · SOFTWARE HOUSE" size={0.05} color="#60a5fa" />
 
       {/* Neon box vertikal (blade sign) di sisi kanan fasad */}
-      <Box x={W - 10} y={D + 10} w={12} d={66} z0={STORY + 0.55} h={0.95} color={BLUE} emissive={BLUE} />
-      <KdsLogoIcon x={W + 4} y={D + 43} z={STORY + 1.22} size={0.42} face="east" />
-      <KdsLogoIcon x={W - 12} y={D + 43} z={STORY + 1.22} size={0.42} face="west" />
-      <Label x={W + 3} y={D + 43} z={STORY + 0.94} rotY={Math.PI / 2} text="KODE" size={0.09} />
-      <Label x={W + 3} y={D + 43} z={STORY + 0.8} rotY={Math.PI / 2} text="SOLUSINDO" size={0.06} />
-      <Label x={W - 11} y={D + 43} z={STORY + 0.94} rotY={-Math.PI / 2} text="KODE" size={0.09} />
+      <Box x={W - 10} y={D + 10} w={12} d={66} z0={SZ + 0.55} h={0.95} color={BLUE} emissive={BLUE} />
+      <KdsLogoIcon x={W + 4} y={D + 43} z={SZ + 1.22} size={0.42} face="east" />
+      <KdsLogoIcon x={W - 12} y={D + 43} z={SZ + 1.22} size={0.42} face="west" />
+      <Label x={W + 3} y={D + 43} z={SZ + 0.94} rotY={Math.PI / 2} text="KODE" size={0.09} />
+      <Label x={W + 3} y={D + 43} z={SZ + 0.8} rotY={Math.PI / 2} text="SOLUSINDO" size={0.06} />
+      <Label x={W - 11} y={D + 43} z={SZ + 0.94} rotY={-Math.PI / 2} text="KODE" size={0.09} />
 
       {/* Stiker sandblast kaca etalase, jam buka di pintu, nomor rumah */}
       <Box x={10} y={D + 5} w={120} d={2} z0={0.42} h={0.22} color="#e8f3f2" opacity={0.8} />
@@ -470,8 +496,8 @@ function Facade() {
       <Label x={315} y={D + 18} z={0.78} text="36" size={0.07} />
 
       {/* Unit AC outdoor di atas papan nama */}
-      <Box x={14} y={D + 4} w={44} d={18} z0={STORY + 0.52} h={0.22} color="#f2f2f2" />
-      <Box x={270} y={D + 4} w={44} d={18} z0={STORY + 0.52} h={0.22} color="#f2f2f2" />
+      <Box x={14} y={D + 4} w={44} d={18} z0={SZ + 0.52} h={0.22} color="#f2f2f2" />
+      <Box x={270} y={D + 4} w={44} d={18} z0={SZ + 0.52} h={0.22} color="#f2f2f2" />
     </group>
   );
 }
@@ -566,21 +592,24 @@ export const KdsRukoScene = memo(function KdsRukoScene({
 }: {
   showInterior?: boolean;
 }) {
+  // Saat LT.2 (interior L1 disembunyikan) bangunan tampil setinggi satu lantai nyata (3,0 m)
+  // dengan Lantai 2 di atasnya. Saat LT.1 semua elemen memakai ukuran cutaway lama (identik).
+  const tall = !showInterior;
   return (
     <group position={[KDS_ORIGIN_X * SCALE, 0, KDS_ORIGIN_Y * SCALE]}>
       <Street />
-      <L1Shell />
+      <L1Shell tall={tall} />
       {showInterior ? <Interior /> : null}
-      <Facade />
+      <Facade tall={tall} />
       {showInterior ? <KdsCats /> : null}
       {/* Tata, resepsionis penerima tamu, standby di belakang meja depan menghadap pintu masuk */}
       {showInterior ? <KdsReceptionist x={205} y={1466} name="Tata" /> : null}
-      <RukoNeighbor x={-8 - NEIGHBOR_W} baseColor="#ece8e1" accent="#d81b60" sign="SALON" shopfront="glass" terrace="#b4533c" />
-      <RukoNeighbor x={-16 - NEIGHBOR_W * 2} baseColor="#e7a1a6" accent="#6d4c41" sign="TOKO" shopfront="rolling" />
-      <RukoNeighbor x={-24 - NEIGHBOR_W * 3} baseColor="#f3efe7" accent="#455a64" sign="BENGKEL" shopfront="rolling" />
-      <RukoNeighbor x={W + 8} baseColor="#eef0f4" accent="#1f3fbf" sign="TOKO PERLENGKAPAN" shopfront="glass" />
-      <RukoNeighbor x={W + 16 + NEIGHBOR_W} baseColor="#f1e6d6" accent="#ef6c00" sign="RUMAH MAKAN" shopfront="rolling" />
-      <RukoNeighbor x={W + 24 + NEIGHBOR_W * 2} baseColor="#e3f0e6" accent="#2e7d32" sign="APOTEK" shopfront="glass" />
+      <RukoNeighbor x={-8 - NEIGHBOR_W} baseColor="#ece8e1" accent="#d81b60" sign="SALON" shopfront="glass" terrace="#b4533c" tall={tall} />
+      <RukoNeighbor x={-16 - NEIGHBOR_W * 2} baseColor="#e7a1a6" accent="#6d4c41" sign="TOKO" shopfront="rolling" tall={tall} />
+      <RukoNeighbor x={-24 - NEIGHBOR_W * 3} baseColor="#f3efe7" accent="#455a64" sign="BENGKEL" shopfront="rolling" tall={tall} />
+      <RukoNeighbor x={W + 8} baseColor="#eef0f4" accent="#1f3fbf" sign="TOKO PERLENGKAPAN" shopfront="glass" tall={tall} />
+      <RukoNeighbor x={W + 16 + NEIGHBOR_W} baseColor="#f1e6d6" accent="#ef6c00" sign="RUMAH MAKAN" shopfront="rolling" tall={tall} />
+      <RukoNeighbor x={W + 24 + NEIGHBOR_W * 2} baseColor="#e3f0e6" accent="#2e7d32" sign="APOTEK" shopfront="glass" tall={tall} />
     </group>
   );
 });

@@ -11,7 +11,7 @@ import {
   KDS_UNITS_PER_METER,
 } from "@/features/retro-office/core/furnitureDefaults";
 import { toWorld } from "@/features/retro-office/core/geometry";
-import { KDS_STORY } from "@/features/retro-office/scene/kdsRuko";
+import { KDS_FLOOR_HEIGHT } from "@/features/retro-office/scene/kdsRuko";
 import {
   KAMAR_STARTS,
   KAMAR_X0,
@@ -19,12 +19,14 @@ import {
   kamarPieces,
 } from "@/features/retro-office/scene/kdsKamarLayout";
 import { makanPieces } from "@/features/retro-office/scene/kdsMakanLayout";
+import { FACADE_GLASS, loungePieces } from "@/features/retro-office/scene/kdsLoungeLayout";
 
 // Lantai 2 Kantor AI KDS — scene dasar (KAN-6).
 // Zonasi & koordinat mengacu KAN-5 (denah disetujui owner). Semua koordinat lokal ruko
 // (x 0..348, y 0..1740; y=0 dinding belakang, y=1740 fasad/jalan), sama seperti kdsRuko.tsx.
-// Grup digeser naik sebesar KDS_STORY agar slab L2 berada di z=1.05. Void tangga (x 240..342,
-// y 0..330) sengaja dibiarkan terbuka agar tangga L1 tetap terlihat.
+// Grup digeser naik sebesar KDS_FLOOR_HEIGHT (tinggi lantai nyata 3,0 m) sehingga pelat L2 berada
+// di atas cangkang L1 setinggi satu lantai penuh. Dinding dalam L2 tetap rendah (cutaway) agar isi
+// ruangan terlihat dari kamera isometrik. Void tangga (x 240..342, y 0..330) dibiarkan terbuka.
 
 const W = KDS_RUKO_WIDTH;
 const D = KDS_RUKO_DEPTH;
@@ -174,7 +176,7 @@ function L2Walls() {
       <Box x={W} y={0} w={8} d={D} h={1.05} color={WALL} />
 
       {/* Fasad depan — kaca gelap + mullion teal (y=1740) untuk lounge. */}
-      <Box x={8} y={D - 4} w={W - 16} d={4} z0={0.05} h={0.95} color="#24343d" opacity={0.5} />
+      <Box x={8} y={D - 4} w={W - 16} d={4} z0={0.05} h={0.95} color={FACADE_GLASS.color} opacity={FACADE_GLASS.opacity} />
       {mullions}
       <Box x={0} y={D - 6} w={W} d={10} z0={1.0} h={0.05} color={TEAL_DARK} />
 
@@ -275,7 +277,7 @@ function L2Signage() {
       <Sign x={118} y={269} z={0.62} text="LAUNDRY" width={panelWidth(7)} />
       <Sign x={58} y={1060} z={0.7} text="RUANG MAKAN" width={panelWidth(11)} />
       <Sign x={300} y={1062} z={0.98} text="PANTRY" width={panelWidth(6)} />
-      <Sign x={174} y={1410} z={0.82} text="RUANG ISTIRAHAT" width={panelWidth(15)} />
+      <Sign x={174} y={1418} z={1.25} text="RUANG ISTIRAHAT" width={panelWidth(15)} />
       <Sign x={237} y={35} z={0.75} text="TANGGA KE LANTAI 1" size={0.16} height={0.24} width={panelWidth(18, 0.16)} />
       <Sign x={237} y={90} z={0.75} text="LANTAI 2" width={panelWidth(8)} />
     </group>
@@ -289,6 +291,27 @@ function L2Makan() {
       {makanPieces().map((p) => (
         <Box
           key={`makan-${p.id}`}
+          x={p.x}
+          y={p.y}
+          w={p.w}
+          d={p.d}
+          z0={SLAB_TOP + p.z0}
+          h={p.h}
+          color={p.color}
+          emissive={p.emissive}
+        />
+      ))}
+    </group>
+  );
+}
+
+// Lounge / ruang istirahat (KAN-9): geometri kotak sederhana, tanpa bayangan.
+function L2Lounge() {
+  return (
+    <group>
+      {loungePieces().map((p) => (
+        <Box
+          key={`lounge-${p.id}`}
           x={p.x}
           y={p.y}
           w={p.w}
@@ -327,19 +350,24 @@ function L2Lights() {
       <Box x={117 - 17} y={1179 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
       <Box x={167 - 17} y={1179 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
       <Box x={217 - 17} y={1179 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
+
+      {/* Panel emissive lounge (warm, hanya mesh L2 — tidak memengaruhi pencahayaan L1). */}
+      <Box x={100 - 17} y={1620 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#ffd9a0" />
+      <Box x={230 - 17} y={1620 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#ffd9a0" />
     </group>
   );
 }
 
 export const KdsLantai2Scene = memo(function KdsLantai2Scene() {
   return (
-    <group position={[KDS_ORIGIN_X * SCALE, KDS_STORY, KDS_ORIGIN_Y * SCALE]}>
+    <group position={[KDS_ORIGIN_X * SCALE, KDS_FLOOR_HEIGHT, KDS_ORIGIN_Y * SCALE]}>
       <L2Slabs />
       <L2Walls />
       <L2Stairs />
       <L2BathLaundry />
       <L2Kamar />
       <L2Makan />
+      <L2Lounge />
       <L2Signage />
       <L2Lights />
     </group>

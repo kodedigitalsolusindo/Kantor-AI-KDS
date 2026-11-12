@@ -93,7 +93,7 @@ import {
   materializeDefaults,
   type OfficeLayoutPreset,
 } from "@/features/retro-office/core/furnitureDefaults";
-import { KdsRukoScene, KDS_STORY } from "@/features/retro-office/scene/kdsRuko";
+import { KdsRukoScene, KDS_FLOOR_HEIGHT } from "@/features/retro-office/scene/kdsRuko";
 import { KdsLantai2Scene } from "@/features/retro-office/scene/kdsLantai2";
 import { ImacModel } from "@/features/retro-office/objects/imac";
 import { ReceptionDeskModel } from "@/features/retro-office/objects/reception";
@@ -2687,8 +2687,8 @@ export function RetroOffice3D({
     const oy = DISTRICT_CAMERA_POSITION[1] - DISTRICT_CAMERA_TARGET[1];
     const oz = DISTRICT_CAMERA_POSITION[2] - DISTRICT_CAMERA_TARGET[2];
     return {
-      pos: [cx + ox, KDS_STORY + oy, cz + oz] as [number, number, number],
-      target: [cx, KDS_STORY, cz] as [number, number, number],
+      pos: [cx + ox, KDS_FLOOR_HEIGHT + oy, cz + oz] as [number, number, number],
+      target: [cx, KDS_FLOOR_HEIGHT, cz] as [number, number, number],
       zoom: 36,
     };
   }, []);
