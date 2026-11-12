@@ -801,14 +801,18 @@ function Street() {
       {/* Halte biru-merah + rambu STOP: di antara KDS dan CV. Dua Bersaudara, lebih banyak di depan CV (HX = sisi kiri halte). */}
       <group>
         <Box x={300} y={yApron + 20} w={160} d={60} z0={1.25} h={0.06} color="#1e5bb8" />
-        {/* Halte menghadap jalan: dinding belakang di sisi trotoar/bangunan, list atap merah di sisi jalan */}
-        <Box x={300} y={yApron + 76} w={160} d={4} z0={1.18} h={0.1} color="#d32f2f" />
+        {/* Halte dibalik (permintaan pemilik): dinding belakang & sandaran bangku di sisi jalan, list atap merah di sisi bangunan */}
+        <Box x={300} y={yApron + 20} w={160} d={4} z0={1.18} h={0.1} color="#d32f2f" />
         {[304, 450].map((hx) =>
           [yApron + 22, yApron + 72].map((hy) => <Box key={`h${hx}${hy}`} x={hx} y={hy} w={6} d={6} h={1.25} color="#1e5bb8" />),
         )}
-        <Box x={300} y={yApron + 19} w={160} d={5} z0={0.1} h={1.08} color="#d32f2f" opacity={0.85} />
-        <Box x={320} y={yApron + 28} w={120} d={18} z0={0.28} h={0.05} color="#9e9e9e" />
-        <Box x={320} y={yApron + 25} w={120} d={3} z0={0.33} h={0.18} color="#9e9e9e" />
+        <Box x={300} y={yApron + 76} w={160} d={5} z0={0.1} h={1.08} color="#d32f2f" opacity={0.85} />
+        <Box x={320} y={yApron + 54} w={120} d={18} z0={0.28} h={0.05} color="#9e9e9e" />
+        <Box x={320} y={yApron + 72} w={120} d={3} z0={0.33} h={0.18} color="#9e9e9e" />
+        {/* Papan BUS MEBIDANG di atas atap, menghadap jalan */}
+        <Box x={318} y={yApron + 74} w={124} d={4} z0={1.31} h={0.24} color="#0d3b8c" />
+        <Box x={318} y={yApron + 74} w={124} d={4} z0={1.31} h={0.035} color="#d32f2f" />
+        <Label x={380} y={yApron + 79} z={1.44} text="BUS MEBIDANG" size={0.11} />
         <Pole x={490} y={yApron + 86} h={1.7} r={0.025} color="#2b6cd4" />
         <Box x={475} y={yApron + 82} w={32} d={3} z0={1.48} h={0.24} color="#1e5bb8" />
         <Label x={491} y={yApron + 85} z={1.6} text="STOP" size={0.07} />
