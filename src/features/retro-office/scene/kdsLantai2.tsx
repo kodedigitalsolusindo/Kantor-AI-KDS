@@ -146,6 +146,11 @@ function L2Slabs() {
 // Dinding timur (sisi kamera) dibuat tembus pandang agar isi kamar tetap terlihat; sekat dalam
 // tetap rendah (cutaway 1.05).
 const L2_WALL_H = KDS_FLOOR_HEIGHT;
+// Dinding kamar tidur, kamar mandi & laundry lebih tinggi (±2,1 m nyata) — permintaan pemilik;
+// dinding hall/tangga/ruang makan tetap rendah (cutaway) agar isi lantai terlihat.
+const ROOM_WALL_H = 2.2;
+// Skala tinggi nyata untuk benda yang menempel/berdiri di dinding (1 m = 58 x 0,018 satuan dunia).
+const fm = (meters: number) => meters * M * SCALE;
 function L2Walls() {
   const mullions: ReactNode[] = [];
   for (let mx = 8; mx <= W - 8; mx += M) {
@@ -169,37 +174,37 @@ function L2Walls() {
       <Box x={-8} y={D - 6} w={W + 16} d={6} z0={L2_WALL_H - 0.12} h={0.12} color={WALL} />
 
       {/* Partisi KM <-> laundry. */}
-      <Box x={0} y={192} w={116} d={8} h={1.05} color={WALL} />
+      <Box x={0} y={192} w={116} d={8} h={ROOM_WALL_H} color={WALL} />
 
       {/* Partisi KM/laundry <-> hall (x 116..124) + bukaan pintu KM & laundry. */}
-      <Box x={116} y={0} w={8} d={96} h={1.05} color={WALL} />
-      <Box x={116} y={142} w={8} d={104} h={1.05} color={WALL} />
-      <Box x={116} y={292} w={8} d={38} h={1.05} color={WALL} />
+      <Box x={116} y={0} w={8} d={96} h={ROOM_WALL_H} color={WALL} />
+      <Box x={116} y={142} w={8} d={104} h={ROOM_WALL_H} color={WALL} />
+      <Box x={116} y={292} w={8} d={38} h={ROOM_WALL_H} color={WALL} />
 
       {/* Partisi hall <-> tangga (x 234..240) + bukaan landing y 0..70. */}
       <Box x={234} y={70} w={6} d={260} h={1.05} color={WALL} />
 
       {/* Partisi belakang <-> hall penghubung (y 330) + bukaan hall. */}
-      <Box x={0} y={330} w={124} d={6} h={1.05} color={WALL} />
+      <Box x={0} y={330} w={124} d={6} h={ROOM_WALL_H} color={WALL} />
       <Box x={234} y={330} w={114} d={6} h={1.05} color={WALL} />
 
       {/* Partisi hall penghubung <-> koridor/kamar (y 420) + bukaan koridor. */}
-      <Box x={122} y={420} w={226} d={6} h={1.05} color={WALL} />
+      <Box x={122} y={420} w={226} d={6} h={ROOM_WALL_H} color={WALL} />
 
       {/* Partisi koridor <-> kamar (x 116..122) + 4 bukaan pintu. */}
-      <Box x={116} y={420} w={6} d={12} h={1.05} color={WALL} />
-      <Box x={116} y={478} w={6} d={111} h={1.05} color={WALL} />
-      <Box x={116} y={635} w={6} d={111} h={1.05} color={WALL} />
-      <Box x={116} y={792} w={6} d={111} h={1.05} color={WALL} />
-      <Box x={116} y={949} w={6} d={93} h={1.05} color={WALL} />
+      <Box x={116} y={420} w={6} d={12} h={ROOM_WALL_H} color={WALL} />
+      <Box x={116} y={478} w={6} d={111} h={ROOM_WALL_H} color={WALL} />
+      <Box x={116} y={635} w={6} d={111} h={ROOM_WALL_H} color={WALL} />
+      <Box x={116} y={792} w={6} d={111} h={ROOM_WALL_H} color={WALL} />
+      <Box x={116} y={949} w={6} d={93} h={ROOM_WALL_H} color={WALL} />
 
       {/* Partisi antar kamar. */}
-      <Box x={122} y={571} w={226} d={6} h={1.05} color={WALL} />
-      <Box x={122} y={728} w={226} d={6} h={1.05} color={WALL} />
-      <Box x={122} y={885} w={226} d={6} h={1.05} color={WALL} />
+      <Box x={122} y={571} w={226} d={6} h={ROOM_WALL_H} color={WALL} />
+      <Box x={122} y={728} w={226} d={6} h={ROOM_WALL_H} color={WALL} />
+      <Box x={122} y={885} w={226} d={6} h={ROOM_WALL_H} color={WALL} />
 
       {/* Partisi koridor/kamar <-> ruang makan (y 1042) + bukaan koridor. */}
-      <Box x={122} y={1042} w={226} d={6} h={1.05} color={WALL} />
+      <Box x={122} y={1042} w={226} d={6} h={ROOM_WALL_H} color={WALL} />
 
       {/* Balok pemisah ruang makan <-> lounge (y 1400). */}
       <Box x={0} y={1397} w={W} d={6} z0={0.92} h={0.13} color={WALL} />
@@ -222,10 +227,87 @@ function L2Stairs() {
   );
 }
 
+// Kamar mandi (x 0..116, y 0..192; pintu di x 116..124, y 96..142) + wastafel di hall luar pintu.
+// Perlengkapan lantai (bak mandi, toilet, wastafel) memakai skala perabot Z_PER_M seperti kasur/meja;
+// kaca shower, kepala shower & cermin menempel dinding memakai skala nyata (fm) dan tetap di bawah
+// tinggi dinding kamar mandi (ROOM_WALL_H).
+const mz = (meters: number) => meters * 0.36;
 function L2BathLaundry() {
-  // KAN-6: KM & laundry hanya struktur (dinding/lantai sudah di L2Slabs/L2Walls).
-  // Detail interior (WC, shower, mesin cuci, dst.) menyusul di KAN-8.
-  return null;
+  const T = SLAB_TOP;
+  const WHITE = "#f8fafc";
+  const GLASS = "#bae6fd";
+  return (
+    <group>
+      {/* Lantai keramik kamar mandi */}
+      <Box x={0} y={0} w={116} d={192} z0={T} h={0.003} color="#cfe3ee" />
+      {/* Shower sudut belakang-barat: tray, 2 panel kaca, pipa + kepala shower, saluran air */}
+      <Box x={4} y={4} w={58} d={58} z0={T} h={0.03} color="#e5e7eb" />
+      <Box x={27} y={27} w={8} d={8} z0={T + 0.031} h={0.003} color="#64748b" />
+      <Box x={62} y={4} w={2} d={60} z0={T} h={fm(1.9)} color={GLASS} opacity={0.35} />
+      <Box x={4} y={62} w={58} d={2} z0={T} h={fm(1.9)} color={GLASS} opacity={0.35} />
+      <Box x={0} y={30} w={3} d={3} z0={T + fm(1.0)} h={fm(0.95)} color="#cbd5e1" />
+      <Box x={0} y={24} w={10} d={15} z0={T + fm(1.95)} h={0.03} color="#94a3b8" />
+      <Box x={0} y={28} w={4} d={6} z0={T + fm(1.1)} h={0.05} color="#94a3b8" />
+      {/* Bak mandi keramik biru + air + gayung */}
+      <Box x={4} y={112} w={48} d={44} z0={T} h={mz(0.8)} color="#3b82f6" />
+      <Box x={8} y={116} w={40} d={36} z0={T + mz(0.8) - 0.012} h={0.014} color="#7dd3fc" emissive="#7dd3fc" />
+      <Box x={40} y={118} w={9} d={9} z0={T + mz(0.8)} h={0.04} color="#f97316" />
+      {/* Toilet duduk: tangki di dinding selatan, dudukan + tutup */}
+      <Box x={70} y={180} w={24} d={10} z0={T} h={mz(0.8)} color={WHITE} />
+      <Box x={72} y={152} w={20} d={28} z0={T} h={mz(0.4)} color={WHITE} />
+      <Box x={71} y={151} w={22} d={30} z0={T + mz(0.4)} h={0.015} color="#e2e8f0" />
+      {/* Handuk tergantung di dinding barat */}
+      <Box x={0} y={78} w={3} d={26} z0={T + fm(1.1)} h={fm(0.5)} color="#f472b6" />
+
+      {/* Wastafel di hall, di luar pintu kamar mandi (menempel muka timur partisi x 124) */}
+      <Box x={124} y={150} w={22} d={38} z0={T} h={mz(0.8)} color="#d6c4a8" />
+      <Box x={124} y={150} w={22} d={38} z0={T + mz(0.8)} h={0.015} color="#e5e7eb" />
+      <Box x={130} y={157} w={12} d={24} z0={T + mz(0.8) + 0.015} h={0.006} color={WHITE} />
+      <Box x={124} y={167} w={5} d={4} z0={T + mz(0.8) + 0.015} h={mz(0.25)} color="#cbd5e1" />
+      {/* Cermin di dinding atas wastafel */}
+      <Box x={124} y={152} w={1} d={34} z0={T + fm(1.15)} h={fm(0.75)} color="#dbeafe" emissive="#bfdbfe" />
+      <Box x={124} y={150} w={1} d={38} z0={T + fm(1.13)} h={0.02} color="#475569" />
+    </group>
+  );
+}
+
+// Pintu kayu terbuka ±70 derajat ke dalam ruangan. Engsel di (hx, hy); daun pintu sepanjang
+// bukaan (len, arah +y saat tertutup); open > 0 berayun ke +x, open < 0 berayun ke -x.
+function Door({ hx, hy, len, open }: { hx: number; hy: number; len: number; open: number }) {
+  const [wx, , wz] = toWorld(hx, hy);
+  const h = fm(2.0);
+  const L = len * SCALE;
+  const dir = Math.sign(open) || 1;
+  return (
+    <group position={[wx, SLAB_TOP, wz]} rotation={[0, (open * Math.PI) / 180, 0]}>
+      <mesh position={[0, h / 2, L / 2]} castShadow={false} receiveShadow={false}>
+        <boxGeometry args={[0.035, h, L]} />
+        <meshStandardMaterial color="#a47148" roughness={0.7} />
+      </mesh>
+      <mesh position={[dir * 0.03, h * 0.47, L * 0.85]}>
+        <boxGeometry args={[0.03, 0.025, 0.06]} />
+        <meshStandardMaterial color="#d4af37" metalness={0.5} roughness={0.3} />
+      </mesh>
+      <mesh position={[-dir * 0.03, h * 0.47, L * 0.85]}>
+        <boxGeometry args={[0.03, 0.025, 0.06]} />
+        <meshStandardMaterial color="#d4af37" metalness={0.5} roughness={0.3} />
+      </mesh>
+    </group>
+  );
+}
+
+function L2Doors() {
+  return (
+    <group>
+      {/* Kamar 1-4: engsel di muka kamar partisi koridor (x 122), terbuka ke dalam kamar */}
+      {[432, 589, 746, 903].map((y) => (
+        <Door key={`pintu-kamar-${y}`} hx={122} hy={y} len={46} open={70} />
+      ))}
+      {/* Kamar mandi & laundry: engsel di sisi barat partisi (x 116), terbuka ke dalam ruangan */}
+      <Door hx={116} hy={96} len={46} open={-70} />
+      <Door hx={116} hy={246} len={46} open={-70} />
+    </group>
+  );
 }
 
 // Furnitur Kamar 1-4 (KAN-7): geometri kotak sederhana, tanpa bayangan.
@@ -336,6 +418,7 @@ export const KdsLantai2Scene = memo(function KdsLantai2Scene() {
       <L2Walls />
       <L2Stairs />
       <L2BathLaundry />
+      <L2Doors />
       <L2Kamar />
       <L2Makan />
       <L2Lounge />
