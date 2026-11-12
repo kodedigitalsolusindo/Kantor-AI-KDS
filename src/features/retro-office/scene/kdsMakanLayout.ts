@@ -2,7 +2,7 @@
 // sama dengan kdsLantai2.tsx / kdsKamarLayout.ts. Data murni agar bisa diuji tanpa render 3D.
 //
 // Dimensi horizontal memakai ukuran nyata. Tinggi memakai skala vertikal yang sama dengan KAN-7
-// (Z_PER_M = 0,36 unit dunia per meter nyata; KDS_STORY = 1,05 untuk +-2,9 m). Posisi z0 relatif
+// (Z_PER_M = 0,36 unit dunia per meter nyata, stilisasi sama dengan perabot L1; tinggi lantai = KDS_FLOOR_HEIGHT 3,0 m). Posisi z0 relatif
 // terhadap permukaan slab (SLAB_TOP). Geometri kotak sederhana, tanpa bayangan.
 
 import { SLAB_TOP, Z_PER_M } from "@/features/retro-office/scene/kdsKamarLayout";

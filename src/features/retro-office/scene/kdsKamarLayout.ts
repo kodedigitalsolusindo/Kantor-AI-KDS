@@ -1,7 +1,7 @@
 // Tata letak furnitur Kamar 1-4 Lantai 2 (KAN-7). Koordinat lokal ruko (satuan, 1 m = 58),
 // sama dengan kdsLantai2.tsx. Data murni agar bisa diuji tanpa render 3D.
 //
-// Skala vertikal: tinggi antar lantai KDS_STORY = 1.05 untuk +-2,9 m nyata, jadi tinggi furnitur
+// Skala vertikal furnitur: Z_PER_M (stilisasi Claw3D, sama dengan perabot L1); tinggi lantai nyata = KDS_FLOOR_HEIGHT (3,0 m), jadi tinggi furnitur
 // dikompres 0,36 unit dunia per meter nyata (bunk bed 1,7 m -> 0,61; lemari 2,0 m -> 0,72).
 // Dimensi horizontal memakai ukuran nyata. Semua furnitur lebih rendah dari dinding (1,05).
 
