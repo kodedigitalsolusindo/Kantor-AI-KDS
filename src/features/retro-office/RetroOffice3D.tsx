@@ -3011,6 +3011,24 @@ export function RetroOffice3D({
     () => furniture.filter((item) => item.type === "chair"),
     [furniture],
   );
+  // LT.2: area depan Lantai 1 (resepsionis + ruang tunggu, lokal y >= 1430) tetap terlihat
+  // dari balik pintu/etalase kaca. Perabot lain, meja kerja, dinding dalam dan agen disembunyikan.
+  const level2FrontFurniture = useMemo(
+    () =>
+      furniture.filter(
+        (item) =>
+          item.type !== "wall" &&
+          item.type !== "desk_cubicle" &&
+          item.y - KDS_ORIGIN_Y >= 1430 &&
+          item.x - KDS_ORIGIN_X >= -10 &&
+          item.x - KDS_ORIGIN_X <= KDS_RUKO_WIDTH + 10,
+      ),
+    [furniture],
+  );
+  const level2FrontChairs = useMemo(
+    () => level2FrontFurniture.filter((item) => item.type === "chair"),
+    [level2FrontFurniture],
+  );
   const activeAtm = useMemo(
     () =>
       activeAtmUid
@@ -5343,13 +5361,13 @@ export function RetroOffice3D({
               <Environment preset="city" />
             </Suspense>
 
-            <group visible={!level2}>
+            <group>
             {/* Furniture models — each loads its GLB asynchronously. */}
             <Suspense fallback={null}>
-              {!editMode ? (
+              {!editMode && !level2 ? (
                 <PrimitiveInstancedWallSegmentsModel items={wallItems} />
               ) : null}
-              {!editMode ? (
+              {!editMode && !level2 ? (
                 <InstancedFurnitureItemsModel
                   itemType="desk_cubicle"
                   items={deskItems}
@@ -5359,10 +5377,10 @@ export function RetroOffice3D({
               {!editMode ? (
                 <InstancedFurnitureItemsModel
                   itemType="chair"
-                  items={chairItems}
+                  items={level2 ? level2FrontChairs : chairItems}
                 />
               ) : null}
-              {furniture.map((item) =>
+              {(level2 ? level2FrontFurniture : furniture).map((item) =>
                 item.type === "wall" ? (
                   editMode ? (
                     <PrimitiveWallSegmentModel
@@ -5804,6 +5822,8 @@ export function RetroOffice3D({
               )}
             </Suspense>
 
+            {/* Selain perabot depan, seluruh isi L1 (agen, jejak, heatmap, ghost) disembunyikan saat LT.2. */}
+            <group visible={!level2}>
             {remoteLayoutFurniture.length > 0 ? (
               <ReadOnlyFurnitureClone furniture={remoteLayoutFurniture} />
             ) : null}
@@ -5924,6 +5944,7 @@ export function RetroOffice3D({
               />
             ) : null}
 
+            </group>
             </group>
             {level2 ? <KdsLantai2Scene /> : null}
             {/* Floor raycaster for edit-mode interaction. */}

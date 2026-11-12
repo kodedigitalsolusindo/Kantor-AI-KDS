@@ -161,24 +161,31 @@ function L2Slabs() {
   );
 }
 
+// Dinding luar Lantai 2 setinggi satu lantai penuh (sama dengan cangkang Lantai 1 saat LT.2).
+// Dinding timur (sisi kamera) dibuat tembus pandang agar isi kamar tetap terlihat; sekat dalam
+// tetap rendah (cutaway 1.05).
+const L2_WALL_H = KDS_FLOOR_HEIGHT;
 function L2Walls() {
   const mullions: ReactNode[] = [];
   for (let mx = 8; mx <= W - 8; mx += M) {
     mullions.push(
-      <Box key={`l2-mullion-${mx}`} x={mx} y={D - 6} w={6} d={10} z0={0.05} h={0.95} color={TEAL} />,
+      <Box key={`l2-mullion-${mx}`} x={mx} y={D - 6} w={6} d={10} z0={0.05} h={L2_WALL_H - 0.1} color={TEAL} />,
     );
   }
   return (
     <group>
-      {/* Perimeter — belakang, kiri, kanan (8 satuan). */}
-      <Box x={-8} y={-8} w={W + 16} d={8} h={1.05} color={WALL} />
-      <Box x={-8} y={0} w={8} d={D} h={1.05} color={WALL} />
+      {/* Perimeter — belakang & barat padat setinggi penuh; timur (menghadap kamera) tembus pandang. */}
+      <Box x={-8} y={-8} w={W + 16} d={8} h={L2_WALL_H} color={WALL} />
+      <Box x={-8} y={0} w={8} d={D} h={L2_WALL_H} color={WALL} />
+      <Box x={W} y={0} w={8} d={D} h={L2_WALL_H} color={WALL} opacity={0.16} />
       <Box x={W} y={0} w={8} d={D} h={1.05} color={WALL} />
 
-      {/* Fasad depan — kaca gelap + mullion teal (y=1740) untuk lounge. */}
-      <Box x={8} y={D - 4} w={W - 16} d={4} z0={0.05} h={0.95} color={FACADE_GLASS.color} opacity={FACADE_GLASS.opacity} />
+      {/* Fasad depan — kaca gelap setinggi penuh + mullion teal (y=1740) untuk lounge. */}
+      <Box x={8} y={D - 4} w={W - 16} d={4} z0={0.05} h={L2_WALL_H - 0.1} color={FACADE_GLASS.color} opacity={0.4} />
       {mullions}
-      <Box x={0} y={D - 6} w={W} d={10} z0={1.0} h={0.05} color={TEAL_DARK} />
+      <Box x={0} y={D - 6} w={W} d={10} z0={L2_WALL_H - 0.05} h={0.05} color={TEAL_DARK} />
+      {/* List atap (parapet) keliling setinggi penuh agar tinggi Lantai 2 terbaca sama dengan Lantai 1. */}
+      <Box x={-8} y={D - 6} w={W + 16} d={6} z0={L2_WALL_H - 0.12} h={0.12} color={WALL} />
 
       {/* Partisi KM <-> laundry. */}
       <Box x={0} y={192} w={116} d={8} h={1.05} color={WALL} />
