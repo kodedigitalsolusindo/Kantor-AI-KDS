@@ -6,7 +6,9 @@ y=0 dinding belakang, y=1740 fasad/jalan), sebelum offset `KDS_ORIGIN`.
 ## Skala & kunci
 
 - 1 m = 58 satuan (`KDS_UNITS_PER_METER`), `SCALE = 0.018`.
-- Tinggi antar lantai `KDS_STORY = 1.05` (slab L2 di z 1.05, tebal 0.04).
+- Tinggi lantai nyata **3,0 m** = `KDS_FLOOR_HEIGHT` (3,0 x 58 x 0.018 = 3,13 satuan dunia). Pelat L2 berada di ketinggian ini (KAN-10).
+- `KDS_STORY = 1.05` tetap dipakai untuk dinding cutaway tampilan LT.1 (tidak berubah) dan dinding dalam L2 (cutaway agar isi ruangan terlihat).
+- Perabot memakai skala vertikal stilisasi `Z_PER_M` = 0,36 per meter, sama dengan perabot Lantai 1.
 - Lebar bangunan 6 m (x 0..348), panjang 30 m (y 0..1740).
 - Partisi antar-ruang 6 satuan (0,10 m), dinding tepi 8 satuan.
 
@@ -91,3 +93,36 @@ Palet: navy `#0b1f3a` (papan), teal `#16a596` (aksen), biru `#2563eb` (ikon), te
 - Signage KAMAR 1-4 digeser ke sisi koridor (x=96) dan dinaikkan di atas puncak partisi (z 1,3) agar teks penuh terlihat.
 - Halaman dibuka dengan level tersimpan LT.2 -> kamera langsung memakai preset LT.2.
 - Geometri kotak sederhana, tanpa bayangan, tanpa pointLight tambahan.
+
+
+## Status implementasi (2026-11-12)
+
+| Story | Isi | Status |
+|---|---|---|
+| KAN-6 | Pelat, dinding, koridor, tangga, 11 papan nama | Selesai, live |
+| KAN-7 | Kamar 1-4: bunk bed, lemari, meja, AC | Selesai, live |
+| KAN-8 | Ruang makan (meja + kursi) dan pantry (kitchen set) | Selesai, live |
+| KAN-9 | Lounge: sofa L, meja kopi, karpet, TV dinding + konsol, bean bag, rak buku, tanaman; kaca fasad L2 gelap | Selesai, live |
+| KAN-10 | Tombol LT.1/LT.2 (kiri atas), kamera LT.2, tinggi lantai nyata 3,0 m | Selesai, live |
+
+### Perilaku tampilan
+
+- **LT.1**: identik dengan versi sebelum Lantai 2 (dinding cutaway, susunan kursi pemilik, namespace layout `kds-ruko-v10` tidak berubah).
+- **LT.2**: interior L1 disembunyikan; cangkang ruko (dinding keliling, tangga, fasad dengan etalase +-2 m dan papan nama tepat di bawah pelat L2) serta ruko tetangga tampil setinggi satu lantai penuh 3,0 m. Lantai 2 berdiri di atasnya.
+- Pilihan lantai disimpan di `localStorage` kunci `kds:office-level` (terpisah dari kunci layout).
+
+### Screenshot (office.profgsc.id)
+
+![Lantai 1 tetap](lantai-2/01-lantai1-tetap.jpg)
+![Lantai 2 ikhtisar](lantai-2/02-lantai2-ikhtisar.jpg)
+![Kamar 1-4](lantai-2/03-lantai2-kamar.png)
+![Ruang makan, pantry, lounge](lantai-2/04-lantai2-makan-lounge.png)
+
+### Deploy
+
+Berkas yang berubah disalin dari `main` ke `/opt/claw3d/app` (pemilik `claw3d`), cadangan berkas lama + `.next` dibuat di `/root/backup-claw3d-<waktu>/`, lalu `npm run build` dan restart `claw3d-studio`.
+
+### Catatan terbuka
+
+- `kdsCats.tsx:80` (Lantai 1) punya error lint lama (`useMemo(buildGraph, [])`) — di luar lingkup Lantai 2.
+- `KDS_DESK_COLUMNS` tidak terpakai di `kdsRuko.tsx` (warning lama).
