@@ -72,15 +72,16 @@ function Box({ x, y, w, d, z0 = 0, h, color, opacity, emissive }: BoxProps) {
   );
 }
 
-// Papan nama ruangan besar: border teal + panel navy + teks putih, menghadap kamera
-// isometrik default (CAM_YAW) agar terbaca tanpa zoom. Acuan ukuran: signage fasad L1.
+// Papan nama ruangan besar: border teal + panel navy + teks putih tebal, menghadap kamera
+// isometrik default (CAM_YAW) agar terbaca tanpa zoom. Teks mengisi ~60-70% tinggi papan
+// dan hampir selebar papan; ketebalan "bold" dibuat lewat outline putih senada.
 function Sign({
   x,
   y,
   z,
   text,
-  size = 0.13,
-  width = 110,
+  size = 0.22,
+  width = 60,
   height = 0.34,
 }: {
   x: number;
@@ -110,13 +111,21 @@ function Sign({
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        maxWidth={width * SCALE * 0.86}
+        maxWidth={width * SCALE * 0.9}
         textAlign="center"
+        outlineWidth={size * 0.09}
+        outlineColor="#ffffff"
       >
         {text}
       </Text>
     </group>
   );
+}
+
+// Perkiraan lebar panel (satuan lokal) agar teks mengisi ~85% lebar papan.
+// charW ≈ 0.6 × fontSize; panelWorld = textWorld / 0.85; lalu / SCALE ke satuan lokal.
+function panelWidth(chars: number, size = 0.22) {
+  return Math.round((chars * 0.6 * size) / 0.85 / SCALE);
 }
 
 // Pelat lantai per zona (bukan satu slab) — void tangga x240..342, y0..330 wajib terbuka.
@@ -225,16 +234,16 @@ function L2BathLaundry() {
 function L2Signage() {
   return (
     <group>
-      <Sign x={130} y={455} z={0.62} text="KAMAR 1" />
-      <Sign x={130} y={612} z={0.62} text="KAMAR 2" />
-      <Sign x={130} y={769} z={0.62} text="KAMAR 3" />
-      <Sign x={130} y={926} z={0.62} text="KAMAR 4" />
-      <Sign x={118} y={119} z={0.62} text="KAMAR MANDI" />
-      <Sign x={118} y={269} z={0.62} text="LAUNDRY" />
-      <Sign x={58} y={1060} z={0.7} text="RUANG MAKAN" />
-      <Sign x={174} y={1410} z={0.82} text="RUANG ISTIRAHAT" />
-      <Sign x={237} y={35} z={0.75} text="TANGGA KE LANTAI 1" size={0.11} width={130} />
-      <Sign x={237} y={90} z={0.75} text="LANTAI 2" />
+      <Sign x={130} y={455} z={0.62} text="KAMAR 1" width={panelWidth(7)} />
+      <Sign x={130} y={612} z={0.62} text="KAMAR 2" width={panelWidth(7)} />
+      <Sign x={130} y={769} z={0.62} text="KAMAR 3" width={panelWidth(7)} />
+      <Sign x={130} y={926} z={0.62} text="KAMAR 4" width={panelWidth(7)} />
+      <Sign x={118} y={119} z={0.62} text="KAMAR MANDI" width={panelWidth(11)} />
+      <Sign x={118} y={269} z={0.62} text="LAUNDRY" width={panelWidth(7)} />
+      <Sign x={58} y={1060} z={0.7} text="RUANG MAKAN" width={panelWidth(11)} />
+      <Sign x={174} y={1410} z={0.82} text="RUANG ISTIRAHAT" width={panelWidth(15)} />
+      <Sign x={237} y={35} z={0.75} text="TANGGA KE LANTAI 1" size={0.16} height={0.24} width={panelWidth(18, 0.16)} />
+      <Sign x={237} y={90} z={0.75} text="LANTAI 2" width={panelWidth(8)} />
     </group>
   );
 }

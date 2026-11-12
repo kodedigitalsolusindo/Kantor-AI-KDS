@@ -2676,6 +2676,22 @@ export function RetroOffice3D({
     () => ({ pos: CAM_POS, target: cameraTarget, zoom: cameraZoom }),
     [CAM_POS, cameraTarget, cameraZoom]
   );
+  // Preset kamera LT.2: target dipusatkan ke tengah bangunan dan zoom diperlebar
+  // agar seluruh 30 m Lantai 2 (termasuk Kamar 1-2 di ujung belakang) terlihat.
+  const lantai2Preset = useMemo(() => {
+    const [cx, , cz] = toWorld(
+      KDS_ORIGIN_X + KDS_RUKO_WIDTH / 2,
+      KDS_ORIGIN_Y + KDS_RUKO_DEPTH / 2,
+    );
+    const ox = DISTRICT_CAMERA_POSITION[0] - DISTRICT_CAMERA_TARGET[0];
+    const oy = DISTRICT_CAMERA_POSITION[1] - DISTRICT_CAMERA_TARGET[1];
+    const oz = DISTRICT_CAMERA_POSITION[2] - DISTRICT_CAMERA_TARGET[2];
+    return {
+      pos: [cx + ox, KDS_STORY + oy, cz + oz] as [number, number, number],
+      target: [cx, KDS_STORY, cz] as [number, number, number],
+      zoom: 38,
+    };
+  }, []);
   const canvasResetKey = useMemo(
     () =>
       [
@@ -5306,11 +5322,9 @@ export function RetroOffice3D({
               color="#7090ff"
             />
 
-            {/* Floor + walls — seluruh scene L1 (interior, fasad, Tata, kucing, signage) disembunyikan saat LT.2. */}
+            {/* L1: cangkang luar (dinding + fasad) & lingkungan tetap tampil saat LT.2; hanya interior yang disembunyikan. */}
             {layoutPreset === "kds_ruko" ? (
-              <group visible={!level2}>
-                <KdsRukoScene />
-              </group>
+              <KdsRukoScene showInterior={!level2} />
             ) : (
               <>
                 <SceneFloorAndWalls showRemoteOffice={remoteOfficeEnabled} />
@@ -5963,11 +5977,7 @@ export function RetroOffice3D({
                   } catch {}
                   if (next === 2) {
                     setEditMode(false);
-                    cameraPresetRef.current = {
-                      pos: [CAM_POS[0], CAM_POS[1] + KDS_STORY, CAM_POS[2]],
-                      target: [cameraTarget[0], cameraTarget[1] + KDS_STORY, cameraTarget[2]],
-                      zoom: 52,
-                    };
+                    cameraPresetRef.current = lantai2Preset;
                   } else {
                     cameraPresetRef.current = overviewPreset;
                   }
