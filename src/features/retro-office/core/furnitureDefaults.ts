@@ -645,7 +645,7 @@ const KDS_RUKO_LOCAL: FurnitureSeed[] = [
   { type: "reception_desk", x: 60, y: 1480, w: 200, h: 45 },
   { type: "chair", x: 148, y: 1460, facing: 180 },
   { type: "computer", x: 140, y: 1482, color: "silver", facing: 180 },
-  // Posisi tanaman, sofa, meja, dispenser, lampu di bawah ini = susunan yang diatur sendiri oleh
+  // Posisi tanaman, sofa, meja, lampu di bawah ini = susunan yang diatur sendiri oleh
   // pemilik (2026-11-11) — JANGAN diubah.
   { type: "plant", x: 310, y: 1720 },
   { type: "plant", x: 250, y: 1540 },
@@ -659,7 +659,8 @@ const KDS_RUKO_LOCAL: FurnitureSeed[] = [
   { type: "couch", x: 220, y: 1640, w: 100, h: 40, facing: 90 },
   { type: "table_rect", x: 200, y: 1650, w: 80, h: 30, facing: 270 },
   { type: "couch", x: 20, y: 1630, w: 100, h: 40, facing: 270 },
-  { type: "water_cooler", x: 270, y: 1660 },
+  // Dispenser AQUA: di samping sofa kiri, dekat pintu masuk ruang front desk (permintaan pemilik 2026-11-12).
+  { type: "water_cooler", x: 60, y: 1553 },
   { type: "plant", x: 30, y: 1720 },
   { type: "lamp", x: 320, y: 1600 },
 ];
