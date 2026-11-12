@@ -17,6 +17,10 @@ export const LOUNGE_WALL_X1 = 348;
 export const UNITS_PER_METER = 58;
 export const MIN_CLEARANCE = UNITS_PER_METER; // lebar jalur minimal 1 m
 export const WALL_TOP = 1.05;
+// Dinding barat/timur lounge setinggi lantai penuh (3,0 m). TV, AC, dan speaker yang menempel di
+// dinding memakai skala tinggi nyata (1 m = 58 x 0,018 satuan dunia), bukan skala perabot Z_PER_M.
+export const FULL_WALL_TOP = 3.0 * 58 * 0.018;
+const fm = (meters: number) => meters * 58 * 0.018;
 
 // Kaca fasad depan Lantai 2: gelap (luminansi rendah), cukup buram agar tidak tembus pandang berlebihan.
 export const FACADE_GLASS = { color: "#0e1a22", opacity: 0.72 } as const;
@@ -53,7 +57,7 @@ const BASE_COFFEE = { x: 100, y: 1604, w: 64, d: 35 }; // meja kopi 1,1 x 0,6 m
 const BASE_CARPET = { x: 80, y: 1560, w: 180, d: 120 };
 // BASE_TV menempel dinding timur di atas konsol; pusat BASE_TV dipakai uji arah hadap.
 const BASE_CONSOLE = { x: 325, y: 1530, w: 23, d: 120 }; // konsol 2,07 x 0,4 m
-const BASE_TV = { x: 344, y: 1535, w: 4, d: 110, z0: m(0.95), h: m(0.72) }; // layar 1,9 m (±85 inci)
+const BASE_TV = { x: 344, y: 1530, w: 4, d: 120, z0: fm(0.75), h: fm(1.17) }; // layar 2,07 x 1,17 m (±95 inci, 16:9), digantung di dinding
 const BASE_BEANBAGS = [
   { x: 108, y: 1676 },
   { x: 158, y: 1676 },
@@ -97,16 +101,16 @@ function basePieces(): LoungePiece[] {
     { id: "tv-bezel", x: BASE_TV.x + 1, y: BASE_TV.y - 3, w: 3, d: BASE_TV.d + 6, z0: BASE_TV.z0 - 0.012, h: BASE_TV.h + 0.024, color: "#0b0f14", group: "tv" },
     { id: "tv-screen", ...BASE_TV, color: "#05080c", emissive: "#12304a", group: "tv" },
     // Home theater: soundbar, AV receiver (+ layar status), 2 speaker tower, subwoofer, 2 surround dinding.
-    { id: "ht-soundbar", x: 336, y: 1550, w: 10, d: 80, z0: m(0.5) + 0.002, h: m(0.08), color: "#1f2937", group: "tv" },
+    { id: "ht-soundbar", x: 340, y: 1545, w: 8, d: 90, z0: fm(0.6), h: fm(0.09), color: "#1f2937", group: "tv" },
     { id: "ht-receiver", x: 330, y: 1532, w: 16, d: 16, z0: m(0.5) + 0.002, h: m(0.15), color: "#111827", group: "tv" },
     { id: "ht-receiver-display", x: 329, y: 1536, w: 1, d: 8, z0: m(0.5) + m(0.07), h: m(0.04), color: "#0ea5e9", emissive: "#38bdf8", group: "tv" },
-    { id: "ht-tower-l", x: 328, y: 1506, w: 18, d: 18, z0: 0, h: m(1.1), color: "#1f2937", group: "tv" },
-    { id: "ht-tower-l-cone", x: 327, y: 1510, w: 1, d: 10, z0: m(0.55), h: m(0.25), color: "#475569", group: "tv" },
-    { id: "ht-tower-r", x: 328, y: 1652, w: 18, d: 18, z0: 0, h: m(1.1), color: "#1f2937", group: "tv" },
-    { id: "ht-tower-r-cone", x: 327, y: 1656, w: 1, d: 10, z0: m(0.55), h: m(0.25), color: "#475569", group: "tv" },
+    { id: "ht-tower-l", x: 328, y: 1506, w: 18, d: 18, z0: 0, h: fm(1.1), color: "#1f2937", group: "tv" },
+    { id: "ht-tower-l-cone", x: 327, y: 1510, w: 1, d: 10, z0: fm(0.55), h: fm(0.3), color: "#475569", group: "tv" },
+    { id: "ht-tower-r", x: 328, y: 1652, w: 18, d: 18, z0: 0, h: fm(1.1), color: "#1f2937", group: "tv" },
+    { id: "ht-tower-r-cone", x: 327, y: 1656, w: 1, d: 10, z0: fm(0.55), h: fm(0.3), color: "#475569", group: "tv" },
     { id: "ht-subwoofer", x: 302, y: 1652, w: 20, d: 20, z0: 0, h: m(0.42), color: "#111827", group: "tv" },
-    { id: "ht-surround-l", x: 0, y: 1560, w: 6, d: 12, z0: m(1.3), h: m(0.3), color: "#1f2937", group: "tv" },
-    { id: "ht-surround-r", x: 0, y: 1676, w: 6, d: 12, z0: m(1.3), h: m(0.3), color: "#1f2937", group: "tv" },
+    { id: "ht-surround-l", x: 0, y: 1560, w: 6, d: 12, z0: fm(1.8), h: fm(0.3), color: "#1f2937", group: "tv" },
+    { id: "ht-surround-r", x: 0, y: 1676, w: 6, d: 12, z0: fm(1.8), h: fm(0.3), color: "#1f2937", group: "tv" },
     // Rak buku: badan + 3 papan buku berwarna.
     { id: "shelf-body", ...BASE_SHELF, z0: 0, h: m(1.8), color: WOOD, fp: true, group: "shelf" },
     ...[0.45, 0.95, 1.45].flatMap((zh, i) => [
@@ -153,10 +157,10 @@ export const PLANTS = BASE_PLANTS.map((pl) => ({ x: MX - pl.x - PLANT_SIZE, y: p
 export function loungePieces(): LoungePiece[] {
   return [
     ...basePieces().map((pc) => mir(pc)),
-    // AC dinding lounge di dinding barat, di atas TV (terlihat kamera): badan putih + kisi + LED.
-    { id: "ac-lounge", x: 0, y: 1562, w: 12, d: 56, z0: 0.62, h: 0.11, color: "#f8fafc", group: "deco" },
-    { id: "ac-lounge-vent", x: 12, y: 1566, w: 1, d: 48, z0: 0.63, h: 0.025, color: "#94a3b8", group: "deco" },
-    { id: "ac-lounge-led", x: 12, y: 1612, w: 1, d: 3, z0: 0.7, h: 0.012, color: "#38bdf8", emissive: "#38bdf8", group: "deco" },
+    // AC dinding lounge di dinding barat setinggi ±2,2 m (di samping atas TV): badan putih + kisi + LED.
+    { id: "ac-lounge", x: 0, y: 1662, w: 14, d: 56, z0: fm(2.2), h: fm(0.3), color: "#cfd8e3", group: "deco" },
+    { id: "ac-lounge-vent", x: 14, y: 1666, w: 1, d: 48, z0: fm(2.24), h: fm(0.06), color: "#475569", group: "deco" },
+    { id: "ac-lounge-led", x: 14, y: 1710, w: 1, d: 3, z0: fm(2.44), h: fm(0.03), color: "#38bdf8", emissive: "#38bdf8", group: "deco" },
   ];
 }
 

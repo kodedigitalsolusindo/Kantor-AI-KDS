@@ -18,7 +18,8 @@ describe("kdsKamarLayout (KAN-7)", () => {
       expect(p.ly, p.id).toBeGreaterThanOrEqual(0);
       expect(p.lx + p.w, p.id).toBeLessThanOrEqual(KAMAR_W - 2);
       expect(p.ly + p.d, p.id).toBeLessThanOrEqual(KAMAR_D - 2);
-      expect(0.04 + p.z0 + p.h, p.id).toBeLessThan(wallTop);
+      // AC menempel di dinding luar setinggi lantai penuh (3,0 m).
+      expect(0.04 + p.z0 + p.h, p.id).toBeLessThan(p.id.startsWith("ac") ? 3.0 * 58 * 0.018 : wallTop);
     }
     expect(KAMAR_WALL_MARGIN).toBeGreaterThan(0);
   });

@@ -324,23 +324,7 @@ function L2Lights() {
       <pointLight position={[dx, 0.95, dz]} intensity={0.35} distance={3} castShadow={false} color="#fff4d6" />
       <pointLight position={[lx, 0.95, lz]} intensity={0.35} distance={3} castShadow={false} color="#fff4d6" />
 
-      {/* Panel emissive koridor. */}
-      {[480, 620, 760, 900, 1020].map((py) => (
-        <Box key={`l2-panel-${py}`} x={58 - 17} y={py - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
-      ))}
-
-      {/* Panel emissive hall servis. */}
-      <Box x={179 - 17} y={120 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
-      <Box x={179 - 17} y={260 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
-
-      {/* Panel emissive ruang makan (di atas meja). */}
-      <Box x={117 - 17} y={1179 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
-      <Box x={167 - 17} y={1179 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
-      <Box x={217 - 17} y={1179 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#fff7d6" />
-
-      {/* Panel emissive lounge (warm, hanya mesh L2 — tidak memengaruhi pencahayaan L1). */}
-      <Box x={100 - 17} y={1620 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#ffd9a0" />
-      <Box x={230 - 17} y={1620 - 17} w={35} d={35} z0={0.99} h={0.02} color="#ffffff" emissive="#ffd9a0" />
+      {/* Panel lampu plafon dihapus (tampak melayang karena Lantai 2 tanpa plafon); cahaya tetap dari pointLight. */}
     </group>
   );
 }
