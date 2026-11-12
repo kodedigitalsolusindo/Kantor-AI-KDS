@@ -166,7 +166,7 @@ function GlassTopWall({ x, y, w, d }: { x: number; y: number; w: number; d: numb
 
 function L2Walls() {
   const mullions: ReactNode[] = [];
-  for (let mx = 8; mx <= W - 8; mx += M) {
+  for (let mx = 8 + M; mx < W - 16; mx += M) {
     mullions.push(
       <Box key={`l2-mullion-${mx}`} x={mx} y={D - 6} w={6} d={10} z0={0.05} h={L2_WALL_H - 0.1} color={TEAL} />,
     );
@@ -175,13 +175,19 @@ function L2Walls() {
     <group>
       {/* Perimeter — belakang & barat padat setinggi penuh; timur (menghadap kamera) tembus pandang. */}
       <Box x={-8} y={-8} w={W + 16} d={8} h={L2_WALL_H} color={WALL} />
-      <Box x={-8} y={0} w={8} d={D} h={L2_WALL_H} color={WALL} />
-      <Box x={W} y={0} w={8} d={D} h={L2_WALL_H} color={WALL} opacity={0.16} />
-      <Box x={W} y={0} w={8} d={D} h={1.05} color={WALL} />
+      {/* Dinding samping diteruskan sampai muka depan fasad (y = D + 4) agar tidak ada celah di sudut. */}
+      <Box x={-8} y={0} w={8} d={D + 4} h={L2_WALL_H} color={WALL} />
+      <Box x={W} y={0} w={8} d={D + 4} h={L2_WALL_H} color={WALL} opacity={0.16} />
+      <Box x={W} y={0} w={8} d={D + 4} h={1.05} color={WALL} />
 
       {/* Fasad depan — kaca gelap setinggi penuh + mullion teal (y=1740) untuk lounge. */}
-      <Box x={8} y={D - 4} w={W - 16} d={4} z0={0.05} h={L2_WALL_H - 0.1} color={FACADE_GLASS.color} opacity={0.4} />
+      <Box x={0} y={D - 4} w={W} d={4} z0={0.05} h={L2_WALL_H - 0.1} color={FACADE_GLASS.color} opacity={0.4} />
       {mullions}
+      {/* Kusen sudut kiri & kanan menempel ke dinding samping — menutup celah dinding <-> kaca. */}
+      <Box x={0} y={D - 6} w={8} d={10} z0={0} h={L2_WALL_H} color={TEAL} />
+      <Box x={W - 8} y={D - 6} w={8} d={10} z0={0} h={L2_WALL_H} color={TEAL} />
+      {/* Ambang bawah kaca sepanjang fasad. */}
+      <Box x={0} y={D - 6} w={W} d={10} z0={0} h={0.06} color={TEAL_DARK} />
       <Box x={0} y={D - 6} w={W} d={10} z0={L2_WALL_H - 0.05} h={0.05} color={TEAL_DARK} />
       {/* List atap (parapet) keliling setinggi penuh agar tinggi Lantai 2 terbaca sama dengan Lantai 1. */}
       <Box x={-8} y={D - 6} w={W + 16} d={6} z0={L2_WALL_H - 0.12} h={0.12} color={WALL} />

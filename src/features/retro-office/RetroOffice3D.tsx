@@ -2235,13 +2235,30 @@ const syncKdsReceptionDesk = (items: FurnitureItem[]): FurnitureItem[] => {
   );
 };
 
+// KDS: dispenser yang masih di posisi lama (pojok depan kanan ruang tunggu, x 310 / y 1690) dipindah
+// ke posisi default terbaru — samping sofa dekat pintu front desk. Posisi lain dianggap pilihan pengguna.
+const KDS_WATER_COOLER_OLD_POS = { x: 310, y: 1690 };
+const syncKdsWaterCooler = (items: FurnitureItem[]): FurnitureItem[] => {
+  const target = materializeDefaults("kds_ruko").find((item) => item.type === "water_cooler");
+  if (!target) return items;
+  return items.map((item) =>
+    item.type === "water_cooler" &&
+    item.x === KDS_WATER_COOLER_OLD_POS.x &&
+    item.y === KDS_WATER_COOLER_OLD_POS.y
+      ? { ...item, x: target.x, y: target.y, elevation: 0 }
+      : item,
+  );
+};
+
 const buildInitialFurnitureLayout = (
   storageNamespace: string,
   layoutPreset: OfficeLayoutPreset,
 ): FurnitureItem[] =>
   // Layout ruko KDS berdiri sendiri: migrasi ensureOffice* akan menyisipkan ruangan kantor bawaan.
   layoutPreset === "kds_ruko"
-    ? syncKdsReceptionDesk(loadFurniture(storageNamespace) ?? materializeDefaults(layoutPreset))
+    ? syncKdsWaterCooler(
+        syncKdsReceptionDesk(loadFurniture(storageNamespace) ?? materializeDefaults(layoutPreset)),
+      )
     : ensureOfficeKanbanBoard(
     ensureOfficeJukebox(
       ensureOfficeQaLab(
