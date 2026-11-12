@@ -318,10 +318,10 @@ export function KdsOffDutyStaff() {
         look={{ shirt: "#a855f7", pants: "#111827", hair: "#2b1810" }} name="Nina" status="Makan" phase={1.6} />
       <Plate x={196} y={1196} z={TABLE_TOP} />
 
-      {/* Lounge: nonton TV di sofa L, main HP di bean bag (menghadap TV di dinding timur) */}
-      <OffDutyPerson x={30} y={1612} z={0} facing={90} pose="recline" action="watch" seatWorld={SOFA_SEAT}
+      {/* Lounge: nonton TV di sofa L, main HP di bean bag (menghadap TV di dinding barat) */}
+      <OffDutyPerson x={318} y={1612} z={0} facing={270} pose="recline" action="watch" seatWorld={SOFA_SEAT}
         look={{ shirt: "#e11d48", pants: "#0f172a", hair: "#121212" }} name="Fajar" status="Nonton TV" phase={0.9} />
-      <OffDutyPerson x={181} y={1699} z={0} facing={90} pose="recline" action="phone" seatWorld={BEANBAG_TOP}
+      <OffDutyPerson x={167} y={1699} z={0} facing={270} pose="recline" action="phone" seatWorld={BEANBAG_TOP}
         look={{ shirt: "#facc15", pants: "#1e3a8a", hair: "#3a2214" }} name="Lia" status="Main HP" phase={2.6} />
     </group>
   );

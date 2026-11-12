@@ -1,7 +1,7 @@
 // Tata letak furnitur Kamar 1-4 Lantai 2 (KAN-7). Koordinat lokal ruko (satuan, 1 m = 58),
 // sama dengan kdsLantai2.tsx. Data murni agar bisa diuji tanpa render 3D.
 //
-// Skala vertikal furnitur: Z_PER_M (stilisasi Claw3D, sama dengan perabot L1); tinggi lantai nyata = KDS_FLOOR_HEIGHT (3,0 m), jadi tinggi furnitur
+// Skala vertikal: tinggi antar lantai KDS_STORY = 1.05 untuk +-2,9 m nyata, jadi tinggi furnitur
 // dikompres 0,36 unit dunia per meter nyata (bunk bed 1,7 m -> 0,61; lemari 2,0 m -> 0,72).
 // Dimensi horizontal memakai ukuran nyata. Semua furnitur lebih rendah dari dinding (1,05).
 
@@ -69,7 +69,9 @@ export function kamarPieces(blanket: string): KamarPiece[] {
     { id: "chair-leg", lx: 88, ly: 101, w: 5, d: 5, z0: 0, h: m(0.42), color: "#333a44" },
     { id: "desk-lamp", lx: 68, ly: 120, w: 6, d: 6, z0: m(0.68) + 0.02, h: m(0.28), color: "#fff7d6", emissive: "#fff7d6" },
     // AC dinding 0,9 x 0,25 m, tinggi (di atas kepala), dinding utara.
-    { id: "ac", lx: 40, ly: 0, w: 52, d: 14, z0: 0.62, h: 0.1, color: "#f2f5f7" },
+    { id: "ac", lx: 40, ly: 0, w: 52, d: 14, z0: 0.62, h: 0.1, color: "#f8fafc" },
+    { id: "ac-vent", lx: 44, ly: 14, w: 44, d: 1, z0: 0.63, h: 0.025, color: "#94a3b8" },
+    { id: "ac-led", lx: 84, ly: 14, w: 3, d: 1, z0: 0.69, h: 0.012, color: "#38bdf8", emissive: "#38bdf8" },
   ];
 }
 

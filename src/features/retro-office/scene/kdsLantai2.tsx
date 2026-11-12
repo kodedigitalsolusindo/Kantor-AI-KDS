@@ -36,11 +36,6 @@ const TEAL = "#16a596";
 const TEAL_DARK = "#0f7f74";
 const NAVY = "#0b1f3a";
 
-// Sudut menghadap kamera isometrik default. Kamera ruko berada pada offset
-// DISTRICT_CAMERA_POSITION - DISTRICT_CAMERA_TARGET = (+14 x, +17 z) dari target,
-// sehingga papan nama harus menghadap arah (+14, +17) agar terbaca tanpa zoom.
-const CAM_YAW = Math.atan2(14, 17);
-
 const WALL = "#f4f1ea";
 const SLAB_CORRIDOR = "#e9e2d4";
 const SLAB_BATH_LAUNDRY = "#dfe6ea";
@@ -82,60 +77,45 @@ function Box({ x, y, w, d, z0 = 0, h, color, opacity, emissive }: BoxProps) {
   );
 }
 
-// Papan nama ruangan besar: border teal + panel navy + teks putih tebal, menghadap kamera
-// isometrik default (CAM_YAW) agar terbaca tanpa zoom. Teks mengisi ~60-70% tinggi papan
-// dan hampir selebar papan; ketebalan "bold" dibuat lewat outline putih senada.
-function Sign({
+// Plakat nama ruangan minimalis yang menempel rata di dinding (bukan papan melayang).
+// face "south" = menempel di muka dinding yang menghadap +y (ke arah jalan/kamera);
+// face "east" = menempel di muka dinding yang menghadap +x. Teks putih kecil di panel navy
+// dengan aksen teal tipis di kiri.
+const PLAQUE_H = 0.11;
+const PLAQUE_FONT = 0.055;
+function plaqueWidth(text: string) {
+  return text.length * PLAQUE_FONT * 0.68 + 0.08;
+}
+function WallPlaque({
   x,
   y,
   z,
   text,
-  size = 0.22,
-  width = 60,
-  height = 0.34,
+  face = "south",
 }: {
   x: number;
   y: number;
   z: number;
   text: string;
-  size?: number;
-  width?: number;
-  height?: number;
+  face?: "south" | "east";
 }) {
-  const [wx, , wz] = toWorld(x, y);
+  const [wx, , wz] = face === "south" ? toWorld(x, y + 0.4) : toWorld(x + 0.4, y);
+  const w = plaqueWidth(text);
   return (
-    <group position={[wx, z, wz]} rotation={[0, CAM_YAW, 0]}>
-      {/* Border teal (lebih lebar dari panel navy). */}
-      <mesh castShadow={false} receiveShadow={false}>
-        <boxGeometry args={[width * SCALE + 0.06, height + 0.06, 0.06]} />
-        <meshStandardMaterial color={TEAL} roughness={0.5} />
-      </mesh>
-      {/* Panel navy. */}
-      <mesh castShadow={false} receiveShadow={false} position={[0, 0, 0.015]}>
-        <boxGeometry args={[width * SCALE, height, 0.05]} />
+    <group position={[wx, z, wz]} rotation={[0, face === "east" ? Math.PI / 2 : 0, 0]}>
+      <mesh position={[0, 0, 0.004]} castShadow={false} receiveShadow={false}>
+        <boxGeometry args={[w, PLAQUE_H, 0.008]} />
         <meshStandardMaterial color={NAVY} roughness={0.6} />
       </mesh>
-      {/* Teks satu baris (tanpa maxWidth agar tidak membungkus), sedikit di depan panel. */}
-      <Text
-        position={[0, 0, 0.05]}
-        fontSize={size}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={size * 0.09}
-        outlineColor="#ffffff"
-      >
+      <mesh position={[-w / 2 + 0.008, 0, 0.009]} castShadow={false} receiveShadow={false}>
+        <boxGeometry args={[0.016, PLAQUE_H, 0.002]} />
+        <meshStandardMaterial color={TEAL} roughness={0.5} />
+      </mesh>
+      <Text position={[0.006, 0, 0.011]} fontSize={PLAQUE_FONT} color="#ffffff" anchorX="center" anchorY="middle" letterSpacing={0.04}>
         {text}
       </Text>
     </group>
   );
-}
-
-// Lebar panel (satuan lokal) = perkiraan lebar teks + padding kiri-kanan.
-// charW ≈ 0.75 × fontSize (cukup longgar untuk huruf kapital + outline bold);
-// padding 0.18 m total (0.09 m per sisi) agar teks tidak keluar dari papan.
-function panelWidth(chars: number, size = 0.22) {
-  return Math.round((chars * 0.75 * size + 0.18) / SCALE);
 }
 
 // Pelat lantai per zona (bukan satu slab) — void tangga x240..342, y0..330 wajib terbuka.
@@ -272,22 +252,21 @@ function L2Kamar() {
   );
 }
 
-// Signage KAMAR 1-4 diletakkan di sisi koridor (x=96) dan di atas puncak dinding partisi (z 1.3)
-// supaya seluruh teks terlihat dari kamera isometrik (tidak tertutup dinding x 116..122).
+// Plakat ruangan menempel di dinding yang terlihat dari kamera isometrik (muka selatan/timur).
 function L2Signage() {
   return (
     <group>
-      <Sign x={96} y={455} z={1.3} text="KAMAR 1" width={panelWidth(7)} />
-      <Sign x={96} y={612} z={1.3} text="KAMAR 2" width={panelWidth(7)} />
-      <Sign x={96} y={769} z={1.3} text="KAMAR 3" width={panelWidth(7)} />
-      <Sign x={96} y={926} z={1.3} text="KAMAR 4" width={panelWidth(7)} />
-      <Sign x={118} y={119} z={0.62} text="KAMAR MANDI" width={panelWidth(11)} />
-      <Sign x={118} y={269} z={0.62} text="LAUNDRY" width={panelWidth(7)} />
-      <Sign x={58} y={1060} z={0.7} text="RUANG MAKAN" width={panelWidth(11)} />
-      <Sign x={300} y={1062} z={0.98} text="PANTRY" width={panelWidth(6)} />
-      <Sign x={174} y={1418} z={1.25} text="RUANG ISTIRAHAT" width={panelWidth(15)} />
-      <Sign x={237} y={35} z={0.75} text="TANGGA KE LANTAI 1" size={0.16} height={0.24} width={panelWidth(18, 0.16)} />
-      <Sign x={237} y={90} z={0.75} text="LANTAI 2" width={panelWidth(8)} />
+      <WallPlaque x={142} y={426} z={0.78} text="KAMAR 1" />
+      <WallPlaque x={142} y={577} z={0.78} text="KAMAR 2" />
+      <WallPlaque x={142} y={734} z={0.78} text="KAMAR 3" />
+      <WallPlaque x={142} y={891} z={0.78} text="KAMAR 4" />
+      <WallPlaque x={58} y={0} z={0.78} text="KAMAR MANDI" />
+      <WallPlaque x={58} y={200} z={0.78} text="LAUNDRY" />
+      <WallPlaque x={240} y={120} z={0.78} text="TANGGA KE LT.1" face="east" />
+      <WallPlaque x={240} y={250} z={0.78} text="LANTAI 2" face="east" />
+      <WallPlaque x={200} y={1048} z={0.78} text="RUANG MAKAN" />
+      <WallPlaque x={298} y={1048} z={0.78} text="PANTRY" />
+      <WallPlaque x={174} y={1403} z={0.985} text="RUANG ISTIRAHAT" />
     </group>
   );
 }

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   BEANBAGS,
-  BEANBAG_SIZE,
   COFFEE,
   CONSOLE,
   FACADE_GLASS,
@@ -86,12 +85,13 @@ describe("kdsLoungeLayout (KAN-9)", () => {
     const dy = t.y - c.y;
     const cos = (dx * SOFA_FACING.x + dy * SOFA_FACING.y) / Math.hypot(dx, dy);
     expect(Math.acos(cos) * (180 / Math.PI)).toBeLessThan(10);
-    // Sandaran di barat (sisi jauh dari TV), TV menempel dinding timur.
-    expect(SOFA_MAIN.x).toBe(0);
-    expect(TV.x + TV.w).toBe(348);
+    // Tata letak dicerminkan (2026-11-12): sandaran sofa di timur, TV menempel dinding barat
+    // (menghadap timur, terlihat dari kamera isometrik).
+    expect(SOFA_MAIN.x + SOFA_MAIN.w).toBe(348);
+    expect(TV.x).toBe(0);
     // Meja kopi di antara sofa dan TV, sejajar sumbu.
-    expect(COFFEE.x).toBeGreaterThan(SOFA_MAIN.x + SOFA_MAIN.w);
-    expect(COFFEE.x + COFFEE.w).toBeLessThan(CONSOLE.x);
+    expect(COFFEE.x + COFFEE.w).toBeLessThan(SOFA_MAIN.x);
+    expect(COFFEE.x).toBeGreaterThan(CONSOLE.x + CONSOLE.w);
     // Konsol TV terpusat pada TV.
     expect(CONSOLE.y + CONSOLE.d / 2).toBe(TV.y + TV.d / 2);
     // TV lebih tinggi dari konsol dan berada di dinding (bukan di lantai).
@@ -120,7 +120,7 @@ describe("kdsLoungeLayout (KAN-9)", () => {
 
   it("jalur pandang sofa ke TV tidak tertutup furnitur tinggi (bean bag/tanaman/rak di luar pita pandang)", () => {
     const sofaC = SOFA_MAIN.y + SOFA_MAIN.d / 2;
-    const band = { x: SOFA_MAIN.x + SOFA_MAIN.w, y: Math.min(sofaC, TV.y), w: CONSOLE.x - SOFA_MAIN.w, d: TV.d };
+    const band = { x: CONSOLE.x + CONSOLE.w, y: Math.min(sofaC, TV.y), w: SOFA_MAIN.x - (CONSOLE.x + CONSOLE.w), d: TV.d };
     for (const p of pieces.filter((q) => ["beanbag", "plant", "shelf"].includes(q.group))) {
       expect(overlap(p, band), p.id).toBe(false);
     }
@@ -132,7 +132,7 @@ describe("kdsLoungeLayout (KAN-9)", () => {
       expect(p.x + p.w).toBeLessThanOrEqual(348);
       expect(p.y + p.d).toBeLessThanOrEqual(LOUNGE_GLASS_Y);
     }
-    for (const b of BEANBAGS) expect(b.x + BEANBAG_SIZE).toBeLessThanOrEqual(CONSOLE.x);
+    for (const b of BEANBAGS) expect(b.x).toBeGreaterThanOrEqual(CONSOLE.x + CONSOLE.w);
   });
 
   it("kaca fasad depan gelap tetapi tidak tembus pandang berlebihan", () => {
