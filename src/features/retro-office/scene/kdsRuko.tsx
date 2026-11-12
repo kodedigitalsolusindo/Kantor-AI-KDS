@@ -274,7 +274,154 @@ function PowerPole({ x, y }: { x: number; y: number }) {
   );
 }
 
-// Ruko tetangga lebar 4 m; papan nama generik (tidak memakai merek usaha asli).
+// Tetangga timur No. 34 sesuai Street View (Agu 2026): fasad biru penuh, papan nama biru besar
+// "CV. DUA BERSAUDARA", etalase kaca kiri, pintu tengah, tembok rendah biru kanan, bendera merah putih.
+function DuaBersaudaraFront({ x, tall }: { x: number; tall: boolean }) {
+  const w = NEIGHBOR_W;
+  const H = tall ? FLOOR_H : STORY;
+  const k = tall ? TALL_STORE_H / 0.82 : 1;
+  const signZ = tall ? TALL_SIGN_Z - 0.35 : 0.62;
+  const signH = tall ? 0.85 : 0.4;
+  const BLUE_FACADE = "#1f45d6";
+  return (
+    <group>
+      {/* Kelongsong biru seluruh muka bangunan */}
+      <Box x={x} y={D} w={w} d={3} h={H} color={BLUE_FACADE} />
+      {/* Papan nama biru besar dengan huruf putih */}
+      <Box x={x + 6} y={D + 3} w={w - 12} d={4} z0={signZ} h={signH} color="#1a3bbf" />
+      <Label x={x + w / 2} y={D + 8} z={signZ + signH * 0.78} text="CV. DUA BERSAUDARA" size={tall ? 0.15 : 0.075} color="#e6ebf5" />
+      <Label x={x + w / 2} y={D + 8} z={signZ + signH * 0.5} text="Pusat: PERLENGKAPAN TNI · POLRI · POL. PP" size={tall ? 0.07 : 0.035} color="#e6ebf5" />
+      <Label x={x + w / 2} y={D + 8} z={signZ + signH * 0.25} text="SECURITY · LINMAS · PRAMUKA & UMUM" size={tall ? 0.07 : 0.035} color="#e6ebf5" />
+      {/* Spanduk kecil warna-warni di atas pintu */}
+      <Box x={x + 14} y={D + 3} w={120} d={3} z0={signZ - 0.12} h={0.1} color="#7a3b1e" />
+      {/* Etalase kaca berisi rak (kiri) */}
+      <Box x={x + 14} y={D + 4} w={60} d={20} z0={0.04} h={0.62 * k} color="#cfe3ea" opacity={0.55} />
+      {[0.18, 0.34, 0.5].map((z) => (
+        <Box key={`rak${z}`} x={x + 16} y={D + 6} w={56} d={16} z0={z * k} h={0.015} color="#8d6e63" />
+      ))}
+      {/* Pintu gelap (tengah) */}
+      <Box x={x + 80} y={D + 3} w={70} d={2} z0={0.04} h={0.7 * k} color="#20262c" />
+      {/* Tembok rendah biru (kanan) */}
+      <Box x={x + 156} y={D + 3} w={w - 160} d={10} z0={0} h={0.3 * k} color={BLUE_FACADE} />
+      {/* Bendera merah putih di sisi kiri */}
+      <Box x={x + 6} y={D + 26} w={2} d={2} h={0.95 * k} color="#d7d7d7" />
+      <Box x={x + 8} y={D + 26} w={2} d={22} z0={0.95 * k - 0.16} h={0.08} color="#d32f2f" />
+      <Box x={x + 8} y={D + 26} w={2} d={22} z0={0.95 * k - 0.24} h={0.08} color="#f5f5f5" />
+      {/* Nomor rumah */}
+      <Label x={x + 152} y={D + 6} z={0.5 * k} text="34" size={0.05} />
+    </group>
+  );
+}
+
+// Tetangga berikutnya sesuai Street View: bangunan putih beraksen oranye, kanopi seng menjorok,
+// spanduk oranye "RM SUDI MAMPIR", etalase lauk, gerobak putih, AC outdoor di dinding atas.
+function SudiMampirFront({ x, tall }: { x: number; tall: boolean }) {
+  const w = NEIGHBOR_W;
+  const H = tall ? FLOOR_H : STORY;
+  const k = tall ? TALL_STORE_H / 0.82 : 1;
+  const awningZ = tall ? 2.05 : 0.86;
+  const ORANGE = "#ec7a2c";
+  return (
+    <group>
+      {/* Muka bangunan putih + lis vertikal oranye */}
+      <Box x={x} y={D} w={w} d={3} h={H} color="#f3f1ec" />
+      <Box x={x} y={D + 1} w={26} d={3} h={H} color={ORANGE} />
+      {/* Pintu masuk berbingkai oranye */}
+      <Box x={x + 30} y={D + 3} w={66} d={2} z0={0.04} h={0.7 * k} color="#3b2a22" />
+      <Box x={x + 28} y={D + 3} w={70} d={3} z0={0.7 * k + 0.04} h={0.05} color={ORANGE} />
+      {/* Kanopi seng menjorok ±1,2 m + tiang depan */}
+      <Box x={x + 4} y={D} w={w - 8} d={70} z0={awningZ} h={0.03} color="#8c939a" />
+      <Box x={x + 10} y={D + 66} w={4} d={4} h={awningZ} color="#6d7378" />
+      <Box x={x + w - 14} y={D + 66} w={4} d={4} h={awningZ} color="#6d7378" />
+      {/* Spanduk oranye di tepi depan kanopi */}
+      <Box x={x + 70} y={D + 68} w={w - 80} d={3} z0={awningZ - (tall ? 0.42 : 0.24)} h={tall ? 0.42 : 0.24} color={ORANGE} />
+      <Label x={x + 70 + (w - 80) / 2} y={D + 72} z={awningZ - (tall ? 0.2 : 0.12)} text="RM SUDI MAMPIR" size={tall ? 0.13 : 0.07} color="#1d2a6b" />
+      {/* Etalase lauk (kaca, dasar kayu gelap) */}
+      <Box x={x + 120} y={D + 8} w={90} d={30} z0={0} h={0.28 * k} color="#4a2f22" />
+      <Box x={x + 120} y={D + 8} w={90} d={30} z0={0.28 * k} h={0.22 * k} color="#d9e7ee" opacity={0.6} />
+      {/* Gerobak putih */}
+      <Box x={x + 100} y={D + 44} w={36} d={22} z0={0.06} h={0.5 * k} color="#f5f5f5" />
+      {/* AC outdoor di dinding atas (hanya terlihat saat tinggi penuh) */}
+      {tall ? (
+        <>
+          <Box x={x + 40} y={D + 3} w={40} d={14} z0={2.55} h={0.22} color="#e6e6e6" />
+          <Box x={x + 90} y={D + 3} w={40} d={14} z0={2.55} h={0.22} color="#e6e6e6" />
+        </>
+      ) : null}
+    </group>
+  );
+}
+
+// Tetangga barat persis (Street View): Secret Beauty Salon — muka putih, spanduk besar putih berlogo
+// pink, 3 AC outdoor, pintu kaca berbingkai baja + panel kayu, undakan teraso merah marun + ramp, kursi plastik.
+function SecretBeautyFront({ x, tall }: { x: number; tall: boolean }) {
+  const w = NEIGHBOR_W;
+  const H = tall ? FLOOR_H : STORY;
+  const k = tall ? TALL_STORE_H / 0.82 : 1;
+  const bannerZ = tall ? 2.25 : 0.72;
+  const bannerH = tall ? 0.85 : 0.3;
+  const MAROON = "#7d2f2a";
+  return (
+    <group>
+      <Box x={x} y={D} w={w} d={3} h={H} color="#f4f3f0" />
+      {/* Spanduk putih besar + lingkaran logo pink */}
+      <Box x={x + 10} y={D + 3} w={w - 20} d={2} z0={bannerZ} h={bannerH} color="#fbfbfb" />
+      <Box x={x + w / 2 - 28} y={D + 5} w={56} d={1} z0={bannerZ + bannerH * 0.18} h={bannerH * 0.64} color="#f2d5e3" />
+      <Label x={x + w / 2} y={D + 7} z={bannerZ + bannerH * 0.55} text="SECRET BEAUTY" size={tall ? 0.11 : 0.05} color="#5b4a52" />
+      <Label x={x + w / 2} y={D + 7} z={bannerZ + bannerH * 0.33} text="Salon" size={tall ? 0.08 : 0.04} color="#c2185b" />
+      {/* 3 AC outdoor di bawah spanduk */}
+      {tall
+        ? [30, 96, 162].map((ax) => <Box key={`ac${ax}`} x={x + ax} y={D + 3} w={40} d={12} z0={1.75} h={0.26} color="#e9e9e9" />)
+        : null}
+      {/* Pintu kaca berbingkai baja (tengah) diapit panel kayu */}
+      <Box x={x + 50} y={D + 3} w={10} d={3} z0={0.12} h={0.62 * k} color="#8a5a3c" />
+      <Box x={x + 60} y={D + 3} w={110} d={2} z0={0.12} h={0.62 * k} color="#b9cdd6" opacity={0.6} />
+      <Box x={x + 170} y={D + 3} w={10} d={3} z0={0.12} h={0.62 * k} color="#8a5a3c" />
+      <Box x={x + 60} y={D + 3} w={110} d={3} z0={0.12 + 0.62 * k} h={0.03} color="#9ea7ad" />
+      {/* Undakan teraso merah marun + ramp beton di tengah */}
+      <Box x={x + 20} y={D} w={w - 40} d={40} h={0.12} color={MAROON} />
+      <Box x={x + 20} y={D + 40} w={w - 40} d={30} h={0.06} color={MAROON} />
+      <Box x={x + 92} y={D} w={40} d={70} z0={0.001} h={0.125} color="#c9bfb4" />
+      {/* Kursi plastik merah & hitam di teras */}
+      <Box x={x + 150} y={D + 10} w={18} d={18} z0={0.12} h={0.22} color="#9b1c2c" />
+      <Box x={x + 172} y={D + 10} w={18} d={18} z0={0.12} h={0.22} color="#2b2b2b" />
+    </group>
+  );
+}
+
+// Tetangga barat kedua: ruko pink — jendela lengkung di atas, pintu lipat kayu cokelat, lis atap.
+function PinkArchFront({ x, tall }: { x: number; tall: boolean }) {
+  const w = NEIGHBOR_W;
+  const H = tall ? FLOOR_H : STORY;
+  const k = tall ? TALL_STORE_H / 0.82 : 1;
+  return (
+    <group>
+      <Box x={x} y={D} w={w} d={3} h={H} color="#e98c96" />
+      {/* Pintu lipat kayu cokelat (dua bukaan) */}
+      {[16, 124].map((px) => (
+        <group key={`pl${px}`}>
+          <Box x={x + px} y={D + 3} w={92} d={3} z0={0.04} h={0.66 * k} color="#5d3a25" />
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <Box key={i} x={x + px + 8 + i * 14} y={D + 6} w={2} d={1} z0={0.06} h={0.62 * k} color="#3f2617" />
+          ))}
+        </group>
+      ))}
+      {/* Lis seng di atas pintu */}
+      <Box x={x} y={D} w={w} d={24} z0={0.66 * k + 0.08} h={0.03} color="#b56a55" />
+      {/* Jendela lengkung berjeruji di lantai atas (hanya saat tinggi penuh) */}
+      {tall
+        ? [30, 92, 154].map((wx) => (
+            <group key={`jl${wx}`}>
+              <Box x={x + wx} y={D + 3} w={46} d={2} z0={2.15} h={0.62} color="#3d4a52" />
+              <Box x={x + wx - 3} y={D + 3} w={52} d={3} z0={2.77} h={0.08} color="#c96b78" />
+            </group>
+          ))
+        : null}
+    </group>
+  );
+}
+
+// Ruko tetangga lebar 4 m. Tetangga dekat KDS memakai fasad khusus sesuai Street View.
 function RukoNeighbor({
   x,
   baseColor,
@@ -283,6 +430,7 @@ function RukoNeighbor({
   shopfront,
   terrace,
   tall = false,
+  style,
 }: {
   x: number;
   baseColor: string;
@@ -291,8 +439,21 @@ function RukoNeighbor({
   shopfront: "glass" | "rolling";
   terrace?: string;
   tall?: boolean;
+  style?: "duaBersaudara" | "sudiMampir" | "secretBeauty" | "pinkArch";
 }) {
   const w = NEIGHBOR_W;
+  if (style) {
+    return (
+      <group>
+        <Box x={x} y={0} w={w} d={D} h={tall ? FLOOR_H : STORY} color={baseColor} />
+        {style === "duaBersaudara" ? <DuaBersaudaraFront x={x} tall={tall} /> : null}
+        {style === "sudiMampir" ? <SudiMampirFront x={x} tall={tall} /> : null}
+        {style === "secretBeauty" ? <SecretBeautyFront x={x} tall={tall} /> : null}
+        {style === "pinkArch" ? <PinkArchFront x={x} tall={tall} /> : null}
+        {terrace ? <Box x={x} y={D} w={w} d={60} h={0.09} color={terrace} /> : null}
+      </group>
+    );
+  }
   // tall (LT.2): tetangga setinggi satu lantai penuh agar sejajar cangkang ruko KDS.
   const k = tall ? TALL_STORE_H / 0.82 : 1;
   const storeH = 0.82 * k;
@@ -604,11 +765,11 @@ export const KdsRukoScene = memo(function KdsRukoScene({
       {showInterior ? <KdsCats /> : null}
       {/* Tata, resepsionis penerima tamu, standby di belakang meja depan menghadap pintu masuk */}
       {showInterior ? <KdsReceptionist x={205} y={1466} name="Tata" /> : null}
-      <RukoNeighbor x={-8 - NEIGHBOR_W} baseColor="#ece8e1" accent="#d81b60" sign="SALON" shopfront="glass" terrace="#b4533c" tall={tall} />
-      <RukoNeighbor x={-16 - NEIGHBOR_W * 2} baseColor="#e7a1a6" accent="#6d4c41" sign="TOKO" shopfront="rolling" tall={tall} />
+      <RukoNeighbor x={-8 - NEIGHBOR_W} baseColor="#f4f3f0" accent="#d81b60" sign="SECRET BEAUTY SALON" shopfront="glass" tall={tall} style="secretBeauty" />
+      <RukoNeighbor x={-16 - NEIGHBOR_W * 2} baseColor="#e98c96" accent="#6d4c41" sign="TOKO" shopfront="rolling" terrace="#a99f93" tall={tall} style="pinkArch" />
       <RukoNeighbor x={-24 - NEIGHBOR_W * 3} baseColor="#f3efe7" accent="#455a64" sign="BENGKEL" shopfront="rolling" tall={tall} />
-      <RukoNeighbor x={W + 8} baseColor="#eef0f4" accent="#1f3fbf" sign="TOKO PERLENGKAPAN" shopfront="glass" tall={tall} />
-      <RukoNeighbor x={W + 16 + NEIGHBOR_W} baseColor="#f1e6d6" accent="#ef6c00" sign="RUMAH MAKAN" shopfront="rolling" tall={tall} />
+      <RukoNeighbor x={W + 8} baseColor="#e4e6ea" accent="#1f3fbf" sign="CV. DUA BERSAUDARA" shopfront="glass" terrace="#d9d6cf" tall={tall} style="duaBersaudara" />
+      <RukoNeighbor x={W + 16 + NEIGHBOR_W} baseColor="#f3f1ec" accent="#ef6c00" sign="RM SUDI MAMPIR" shopfront="rolling" terrace="#cfccc4" tall={tall} style="sudiMampir" />
       <RukoNeighbor x={W + 24 + NEIGHBOR_W * 2} baseColor="#e3f0e6" accent="#2e7d32" sign="APOTEK" shopfront="glass" tall={tall} />
     </group>
   );
