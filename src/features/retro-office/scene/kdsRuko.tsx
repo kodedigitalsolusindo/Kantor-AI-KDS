@@ -243,37 +243,6 @@ function Motorbike({ x, y, color }: { x: number; y: number; color: string }) {
   );
 }
 
-function worldPoint(cx: number, cy: number, height: number): [number, number, number] {
-  const [wx, , wz] = toWorld(cx, cy);
-  return [wx, height, wz];
-}
-
-function Cable({ from, to }: { from: [number, number, number]; to: [number, number, number] }) {
-  const dx = to[0] - from[0];
-  const dy = to[1] - from[1];
-  const dz = to[2] - from[2];
-  const length = Math.hypot(dx, dy, dz);
-  const mid: [number, number, number] = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2 - 0.05, (from[2] + to[2]) / 2];
-  const yaw = Math.atan2(dx, dz);
-  const pitch = Math.atan2(dy, Math.hypot(dx, dz));
-  return (
-    <mesh position={mid} rotation={[Math.PI / 2 - pitch, yaw, 0, "YXZ"]}>
-      <cylinderGeometry args={[0.008, 0.008, length, 4]} />
-      <meshStandardMaterial color="#151515" />
-    </mesh>
-  );
-}
-
-function PowerPole({ x, y }: { x: number; y: number }) {
-  return (
-    <group>
-      <Pole x={x} y={y} h={3.4} r={0.07} color="#9e9e9e" />
-      <Box x={x - 40} y={y - 2} w={80} d={4} z0={3.15} h={0.05} color="#7d7d7d" />
-      <Box x={x - 8} y={y - 8} w={16} d={10} z0={2.55} h={0.28} color="#5f6b73" />
-    </group>
-  );
-}
-
 // Tetangga timur No. 34 sesuai Street View (Agu 2026): fasad biru penuh, papan nama biru besar
 // "CV. DUA BERSAUDARA", etalase kaca kiri, pintu tengah, tembok rendah biru kanan, bendera merah putih.
 function DuaBersaudaraFront({ x, tall }: { x: number; tall: boolean }) {
@@ -694,10 +663,7 @@ function Street() {
       <Box x={-180} y={yApron + 40} w={120} d={50} z0={0.003} h={0.003} color="#958f85" />
       <Motorbike x={40} y={yApron + 70} color="#c62828" />
       <Motorbike x={85} y={yApron + 72} color="#1565c0" />
-      <Motorbike x={270} y={yApron + 70} color="#212121" />
-      <Motorbike x={315} y={yApron + 72} color="#f9a825" />
       <Motorbike x={-150} y={yApron + 70} color="#ad1457" />
-      <Motorbike x={430} y={yApron + 74} color="#455a64" />
 
       {/* Jalan Gatot Subroto */}
       <Box x={-1700} y={yCurb} w={3800} d={8} h={0.04} color="#cfcac0" />
@@ -713,37 +679,28 @@ function Street() {
       <Box x={-1700} y={yMedian - 2} w={3800} d={14} z0={0.35} h={0.035} color="#2e7d32" />
       <Box x={-1700} y={yMedian + 10} w={3800} d={300} z0={-0.01} h={0.012} color="#45484c" />
 
-      {/* Halte biru-merah + rambu STOP (sisi kanan, seperti di Street View) */}
+      {/* Halte biru-merah + rambu STOP: di antara KDS dan CV. Dua Bersaudara, lebih banyak di depan CV (HX = sisi kiri halte). */}
       <group>
-        <Box x={650} y={yApron + 20} w={160} d={60} z0={1.25} h={0.06} color="#1e5bb8" />
+        <Box x={300} y={yApron + 20} w={160} d={60} z0={1.25} h={0.06} color="#1e5bb8" />
         {/* Halte menghadap jalan: dinding belakang di sisi trotoar/bangunan, list atap merah di sisi jalan */}
-        <Box x={650} y={yApron + 76} w={160} d={4} z0={1.18} h={0.1} color="#d32f2f" />
-        {[654, 800].map((hx) =>
+        <Box x={300} y={yApron + 76} w={160} d={4} z0={1.18} h={0.1} color="#d32f2f" />
+        {[304, 450].map((hx) =>
           [yApron + 22, yApron + 72].map((hy) => <Box key={`h${hx}${hy}`} x={hx} y={hy} w={6} d={6} h={1.25} color="#1e5bb8" />),
         )}
-        <Box x={650} y={yApron + 19} w={160} d={5} z0={0.1} h={1.08} color="#d32f2f" opacity={0.85} />
-        <Box x={670} y={yApron + 28} w={120} d={18} z0={0.28} h={0.05} color="#9e9e9e" />
-        <Box x={670} y={yApron + 25} w={120} d={3} z0={0.33} h={0.18} color="#9e9e9e" />
-        <Pole x={840} y={yApron + 86} h={1.7} r={0.025} color="#2b6cd4" />
-        <Box x={825} y={yApron + 82} w={32} d={3} z0={1.48} h={0.24} color="#1e5bb8" />
-        <Label x={841} y={yApron + 85} z={1.6} text="STOP" size={0.07} />
-        <Box x={825} y={yApron + 82} w={32} d={3} z0={1.3} h={0.14} color="#f2f2f2" />
-        <Label x={841} y={yApron + 85} z={1.37} text="HALTE" size={0.05} color={NAVY} />
+        <Box x={300} y={yApron + 19} w={160} d={5} z0={0.1} h={1.08} color="#d32f2f" opacity={0.85} />
+        <Box x={320} y={yApron + 28} w={120} d={18} z0={0.28} h={0.05} color="#9e9e9e" />
+        <Box x={320} y={yApron + 25} w={120} d={3} z0={0.33} h={0.18} color="#9e9e9e" />
+        <Pole x={490} y={yApron + 86} h={1.7} r={0.025} color="#2b6cd4" />
+        <Box x={475} y={yApron + 82} w={32} d={3} z0={1.48} h={0.24} color="#1e5bb8" />
+        <Label x={491} y={yApron + 85} z={1.6} text="STOP" size={0.07} />
+        <Box x={475} y={yApron + 82} w={32} d={3} z0={1.3} h={0.14} color="#f2f2f2" />
+        <Label x={491} y={yApron + 85} z={1.37} text="HALTE" size={0.05} color={NAVY} />
       </group>
 
-      {/* Pohon peneduh & tiang listrik dengan kabel */}
+      {/* Pohon peneduh (tiang listrik & kabel dihapus atas permintaan pemilik, 2026-11-12) */}
       <Tree x={-380} y={yApron + 120} scale={1.1} />
       <Tree x={1000} y={yApron + 125} scale={1.2} />
       <Tree x={-900} y={yApron + 125} />
-      <PowerPole x={-70} y={yCurb - 6} />
-      <PowerPole x={420} y={yCurb - 6} />
-      <PowerPole x={1100} y={yCurb - 6} />
-      <Cable from={worldPoint(-70, yCurb - 6, 3.18)} to={worldPoint(420, yCurb - 6, 3.18)} />
-      <Cable from={worldPoint(-70, yCurb - 6, 3.05)} to={worldPoint(420, yCurb - 6, 3.05)} />
-      <Cable from={worldPoint(420, yCurb - 6, 3.18)} to={worldPoint(1100, yCurb - 6, 3.18)} />
-      <Cable from={worldPoint(420, yCurb - 6, 3.05)} to={worldPoint(1100, yCurb - 6, 3.05)} />
-      <Cable from={worldPoint(420, yCurb - 6, 2.7)} to={worldPoint(292, D + 12, 1.75)} />
-      <Cable from={worldPoint(-70, yCurb - 6, 2.7)} to={worldPoint(36, D + 12, 1.75)} />
     </group>
   );
 }
