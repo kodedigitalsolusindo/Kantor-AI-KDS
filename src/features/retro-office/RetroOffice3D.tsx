@@ -93,7 +93,7 @@ import {
   materializeDefaults,
   type OfficeLayoutPreset,
 } from "@/features/retro-office/core/furnitureDefaults";
-import { KdsRukoScene } from "@/features/retro-office/scene/kdsRuko";
+import { KdsRukoScene, KDS_STORY } from "@/features/retro-office/scene/kdsRuko";
 import { KdsLantai2Scene } from "@/features/retro-office/scene/kdsLantai2";
 import { ImacModel } from "@/features/retro-office/objects/imac";
 import { ReceptionDeskModel } from "@/features/retro-office/objects/reception";
@@ -5306,9 +5306,11 @@ export function RetroOffice3D({
               color="#7090ff"
             />
 
-            {/* Floor + walls — always visible, no async loading. */}
+            {/* Floor + walls — seluruh scene L1 (interior, fasad, Tata, kucing, signage) disembunyikan saat LT.2. */}
             {layoutPreset === "kds_ruko" ? (
-              <KdsRukoScene />
+              <group visible={!level2}>
+                <KdsRukoScene />
+              </group>
             ) : (
               <>
                 <SceneFloorAndWalls showRemoteOffice={remoteOfficeEnabled} />
@@ -5962,8 +5964,8 @@ export function RetroOffice3D({
                   if (next === 2) {
                     setEditMode(false);
                     cameraPresetRef.current = {
-                      pos: [CAM_POS[0], CAM_POS[1] + 1.6, CAM_POS[2]],
-                      target: [cameraTarget[0], cameraTarget[1] + 1.05, cameraTarget[2]],
+                      pos: [CAM_POS[0], CAM_POS[1] + KDS_STORY, CAM_POS[2]],
+                      target: [cameraTarget[0], cameraTarget[1] + KDS_STORY, cameraTarget[2]],
                       zoom: 52,
                     };
                   } else {

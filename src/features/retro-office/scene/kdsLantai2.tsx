@@ -26,6 +26,11 @@ const TEAL = "#16a596";
 const TEAL_DARK = "#0f7f74";
 const NAVY = "#0b1f3a";
 
+// Sudut menghadap kamera isometrik default. Kamera ruko berada pada offset
+// DISTRICT_CAMERA_POSITION - DISTRICT_CAMERA_TARGET = (+14 x, +17 z) dari target,
+// sehingga papan nama harus menghadap arah (+14, +17) agar terbaca tanpa zoom.
+const CAM_YAW = Math.atan2(14, 17);
+
 const WALL = "#f4f1ea";
 const SLAB_CORRIDOR = "#e9e2d4";
 const SLAB_BATH_LAUNDRY = "#dfe6ea";
@@ -67,38 +72,45 @@ function Box({ x, y, w, d, z0 = 0, h, color, opacity, emissive }: BoxProps) {
   );
 }
 
-// Papan nama ruangan: panel navy + teks putih, gaya label L1.
+// Papan nama ruangan besar: border teal + panel navy + teks putih, menghadap kamera
+// isometrik default (CAM_YAW) agar terbaca tanpa zoom. Acuan ukuran: signage fasad L1.
 function Sign({
   x,
   y,
   z,
   text,
-  rotY = 0,
-  size = 0.045,
-  width = 46,
+  size = 0.13,
+  width = 110,
+  height = 0.34,
 }: {
   x: number;
   y: number;
   z: number;
   text: string;
-  rotY?: number;
   size?: number;
   width?: number;
+  height?: number;
 }) {
   const [wx, , wz] = toWorld(x, y);
   return (
-    <group position={[wx, z, wz]} rotation={[0, rotY, 0]}>
+    <group position={[wx, z, wz]} rotation={[0, CAM_YAW, 0]}>
+      {/* Border teal (lebih lebar dari panel navy). */}
       <mesh castShadow={false} receiveShadow={false}>
-        <boxGeometry args={[width * SCALE, 0.2, 0.06]} />
-        <meshStandardMaterial color={NAVY} roughness={0.7} />
+        <boxGeometry args={[width * SCALE + 0.06, height + 0.06, 0.06]} />
+        <meshStandardMaterial color={TEAL} roughness={0.5} />
+      </mesh>
+      {/* Panel navy. */}
+      <mesh castShadow={false} receiveShadow={false} position={[0, 0, 0.015]}>
+        <boxGeometry args={[width * SCALE, height, 0.05]} />
+        <meshStandardMaterial color={NAVY} roughness={0.6} />
       </mesh>
       <Text
-        position={[0, 0, 0.035]}
+        position={[0, 0, 0.05]}
         fontSize={size}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        maxWidth={width * SCALE * 0.92}
+        maxWidth={width * SCALE * 0.86}
         textAlign="center"
       >
         {text}
@@ -213,16 +225,16 @@ function L2BathLaundry() {
 function L2Signage() {
   return (
     <group>
-      <Sign x={120} y={455} z={0.62} text="KAMAR 1" rotY={-Math.PI / 2} />
-      <Sign x={120} y={612} z={0.62} text="KAMAR 2" rotY={-Math.PI / 2} />
-      <Sign x={120} y={769} z={0.62} text="KAMAR 3" rotY={-Math.PI / 2} />
-      <Sign x={120} y={926} z={0.62} text="KAMAR 4" rotY={-Math.PI / 2} />
-      <Sign x={120} y={119} z={0.62} text="KAMAR MANDI" rotY={-Math.PI / 2} />
-      <Sign x={120} y={269} z={0.62} text="LAUNDRY" rotY={-Math.PI / 2} />
+      <Sign x={130} y={455} z={0.62} text="KAMAR 1" />
+      <Sign x={130} y={612} z={0.62} text="KAMAR 2" />
+      <Sign x={130} y={769} z={0.62} text="KAMAR 3" />
+      <Sign x={130} y={926} z={0.62} text="KAMAR 4" />
+      <Sign x={118} y={119} z={0.62} text="KAMAR MANDI" />
+      <Sign x={118} y={269} z={0.62} text="LAUNDRY" />
       <Sign x={58} y={1060} z={0.7} text="RUANG MAKAN" />
-      <Sign x={174} y={1410} z={0.95} text="RUANG ISTIRAHAT" />
-      <Sign x={237} y={35} z={0.75} text="TANGGA KE LANTAI 1" rotY={-Math.PI / 2} size={0.04} />
-      <Sign x={237} y={90} z={0.75} text="LANTAI 2" rotY={-Math.PI / 2} />
+      <Sign x={174} y={1410} z={0.82} text="RUANG ISTIRAHAT" />
+      <Sign x={237} y={35} z={0.75} text="TANGGA KE LANTAI 1" size={0.11} width={130} />
+      <Sign x={237} y={90} z={0.75} text="LANTAI 2" />
     </group>
   );
 }
