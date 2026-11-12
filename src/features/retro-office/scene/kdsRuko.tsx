@@ -111,8 +111,85 @@ function Label({
   );
 }
 
-// Logo KDS asli (assets/img/logo.svg): kotak sudut membulat, gradasi #2563eb -> #06b6d4, simbol </> putih.
-function useKdsLogoTexture() {
+type LogoKind = "kds" | "ainichat" | "kencang";
+
+// Tekstur logo (canvas). KDS: assets/img/logo.svg (gradasi #2563eb -> #06b6d4, simbol </>).
+// AiniChat: ainichat.com/icon.svg (gradasi biru, gelembung chat + pin). kencang.in: apple-touch-icon
+// (gradasi oranye -> ungu, petir putih + garis kecepatan).
+function drawLogo(ctx: CanvasRenderingContext2D, size: number, kind: LogoKind) {
+  if (kind === "ainichat") {
+    const k = size / 512;
+    const g = ctx.createLinearGradient(0, 0, 0, size);
+    g.addColorStop(0, "#4b9bff");
+    g.addColorStop(1, "#2f80ed");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, size, size, 112 * k);
+    ctx.fill();
+    ctx.save();
+    ctx.scale(k, k);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill(new Path2D("M256 112c-88 0-152 56-152 128 0 40 20 75 52 98l-14 60 66-34c15 4 31 6 48 6 88 0 152-56 152-130s-64-128-152-128z"));
+    ctx.fillStyle = "#2f80ed";
+    ctx.fill(new Path2D("M256 196c-26 0-46 20-46 45 0 36 46 74 46 74s46-38 46-74c0-25-20-45-46-45z"));
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(256, 241, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+  if (kind === "kencang") {
+    const k = size / 180;
+    const g = ctx.createLinearGradient(0, 0, size, size);
+    g.addColorStop(0, "#f45b45");
+    g.addColorStop(0.55, "#c14a8f");
+    g.addColorStop(1, "#7343e3");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, size, size, 34 * k);
+    ctx.fill();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineCap = "round";
+    ctx.lineWidth = 7 * k;
+    for (const [y0, x1] of [[62, 46], [90, 40], [118, 46]] as const) {
+      ctx.beginPath();
+      ctx.moveTo(12 * k, y0 * k);
+      ctx.lineTo(x1 * k, y0 * k);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    const bolt: [number, number][] = [[106, 16], [60, 96], [94, 96], [76, 164], [136, 70], [101, 70], [106, 16]];
+    bolt.forEach(([px, py], i) => (i ? ctx.lineTo(px * k, py * k) : ctx.moveTo(px * k, py * k)));
+    ctx.fill();
+    return;
+  }
+  const k = size / 64;
+  const gradient = ctx.createLinearGradient(0, 0, size, size);
+  gradient.addColorStop(0, "#2563eb");
+  gradient.addColorStop(1, "#06b6d4");
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.roundRect(0, 0, size, size, 16 * k);
+  ctx.fill();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  const stroke = (points: [number, number][], width: number, alpha: number) => {
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = width * k;
+    ctx.beginPath();
+    points.forEach(([px, py], i) => (i ? ctx.lineTo(px * k, py * k) : ctx.moveTo(px * k, py * k)));
+    ctx.stroke();
+  };
+  stroke([[24, 20], [13, 32], [24, 44]], 5, 1);
+  stroke([[40, 20], [51, 32], [40, 44]], 5, 0.75);
+  stroke([[36, 17], [28, 47]], 4.5, 1);
+  ctx.globalAlpha = 1;
+}
+
+function useLogoTexture(kind: LogoKind) {
   return useMemo(() => {
     if (typeof document === "undefined") return null;
     const size = 256;
@@ -121,56 +198,45 @@ function useKdsLogoTexture() {
     canvas.height = size;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
-    const k = size / 64;
-    const gradient = ctx.createLinearGradient(0, 0, size, size);
-    gradient.addColorStop(0, "#2563eb");
-    gradient.addColorStop(1, "#06b6d4");
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.roundRect(0, 0, size, size, 16 * k);
-    ctx.fill();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    const stroke = (points: [number, number][], width: number, alpha: number) => {
-      ctx.globalAlpha = alpha;
-      ctx.lineWidth = width * k;
-      ctx.beginPath();
-      points.forEach(([px, py], i) => (i ? ctx.lineTo(px * k, py * k) : ctx.moveTo(px * k, py * k)));
-      ctx.stroke();
-    };
-    stroke([[24, 20], [13, 32], [24, 44]], 5, 1);
-    stroke([[40, 20], [51, 32], [40, 44]], 5, 0.75);
-    stroke([[36, 17], [28, 47]], 4.5, 1);
+    drawLogo(ctx, size, kind);
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 4;
     return texture;
-  }, []);
+  }, [kind]);
 }
 
+const LOGO_BODY: Record<LogoKind, { color: string; emissive: string }> = {
+  kds: { color: "#2563eb", emissive: "#1d4ed8" },
+  ainichat: { color: "#2f80ed", emissive: "#1f6fd8" },
+  kencang: { color: "#a64aa8", emissive: "#7343e3" },
+};
+
 // Ikon logo akrilik tebal (huruf timbul) dengan muka logo; face = arah hadap muka logo.
-export function KdsLogoIcon({
+export function LogoIcon({
   x,
   y,
   z,
   size,
   face = "south",
+  kind,
 }: {
   x: number;
   y: number;
   z: number;
   size: number;
   face?: "south" | "east" | "west";
+  kind: LogoKind;
 }) {
-  const texture = useKdsLogoTexture();
+  const texture = useLogoTexture(kind);
   const [wx, , wz] = toWorld(x, y);
   const depth = Math.max(0.025, size * 0.12);
   const rotY = face === "east" ? Math.PI / 2 : face === "west" ? -Math.PI / 2 : 0;
+  const body = LOGO_BODY[kind];
   return (
     <group position={[wx, z, wz]} rotation={[0, rotY, 0]}>
       <RoundedBox args={[size, size, depth]} radius={size * 0.22} smoothness={4}>
-        <meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.35} roughness={0.4} />
+        <meshStandardMaterial color={body.color} emissive={body.emissive} emissiveIntensity={0.35} roughness={0.4} />
       </RoundedBox>
       {texture ? (
         <mesh position={[0, 0, depth / 2 + 0.002]}>
@@ -178,6 +244,51 @@ export function KdsLogoIcon({
           <meshBasicMaterial map={texture} transparent toneMapped={false} />
         </mesh>
       ) : null}
+    </group>
+  );
+}
+
+export function KdsLogoIcon(props: { x: number; y: number; z: number; size: number; face?: "south" | "east" | "west" }) {
+  return <LogoIcon {...props} kind="kds" />;
+}
+
+// Tulisan timbul (huruf akrilik tebal): beberapa lapis teks bertumpuk ke arah jalan (y) sehingga
+// tepi huruf tampak tebal dari kamera isometrik; lapisan depan putih dengan garis tepi tipis.
+function EmbossedLabel({
+  x,
+  y,
+  z,
+  text,
+  size,
+  depthUnits = 5,
+  face = "#ffffff",
+  side = "#9db8e8",
+}: {
+  x: number;
+  y: number;
+  z: number;
+  text: string;
+  size: number;
+  depthUnits?: number;
+  face?: string;
+  side?: string;
+}) {
+  const layers: ReactNode[] = [];
+  for (let i = 0; i < depthUnits; i += 1) {
+    const [wx, , wz] = toWorld(x, y - depthUnits + i);
+    layers.push(
+      <Text key={`emb${i}`} position={[wx, z, wz]} fontSize={size} color={side} anchorX="left" anchorY="middle">
+        {text}
+      </Text>,
+    );
+  }
+  const [fx, , fz] = toWorld(x, y);
+  return (
+    <group>
+      {layers}
+      <Text position={[fx, z, fz]} fontSize={size} color={face} anchorX="left" anchorY="middle" outlineWidth={size * 0.03} outlineColor="#dbe7ff">
+        {text}
+      </Text>
     </group>
   );
 }
@@ -600,9 +711,17 @@ function Facade({ tall = false }: { tall?: boolean }) {
       {/* Papan nama: panel ACP navy + huruf timbul akrilik backlit LED */}
       <Box x={0} y={D} w={W} d={14} z0={SZ} h={0.5} color="#f7f7f2" />
       <Box x={8} y={D + 14} w={W - 16} d={5} z0={SZ + 0.04} h={0.42} color={NAVY} />
+      {/* Logo KDS + tulisan timbul KodeSolusindo rapat di sebelahnya */}
       <KdsLogoIcon x={34} y={D + 21} z={SZ + 0.25} size={0.36} />
-      <Label x={200} y={D + 24} z={SZ + 0.3} text="KodeSolusindo" size={0.2} />
-      <Label x={200} y={D + 24} z={SZ + 0.12} text="PT KODE DIGITAL SOLUSINDO · SOFTWARE HOUSE" size={0.05} color="#60a5fa" />
+      <EmbossedLabel x={50} y={D + 25} z={SZ + 0.3} text="KodeSolusindo" size={0.2} />
+      <Text position={toWorld(51, D + 25).map((v, i) => (i === 1 ? SZ + 0.12 : v)) as [number, number, number]} fontSize={0.045} color="#60a5fa" anchorX="left" anchorY="middle">
+        PT KODE DIGITAL SOLUSINDO · SOFTWARE HOUSE
+      </Text>
+      {/* Produk KDS di sisi kanan papan: AiniChat & kencang.in */}
+      <LogoIcon kind="ainichat" x={222} y={D + 21} z={SZ + 0.28} size={0.28} />
+      <Label x={222} y={D + 22} z={SZ + 0.09} text="AiniChat" size={0.045} color="#bfdbfe" />
+      <LogoIcon kind="kencang" x={268} y={D + 21} z={SZ + 0.28} size={0.28} />
+      <Label x={268} y={D + 22} z={SZ + 0.09} text="kencang.in" size={0.045} color="#fbcfe8" />
 
       {/* Neon box vertikal (blade sign) di sisi kanan fasad */}
       <Box x={W - 10} y={D + 10} w={12} d={66} z0={SZ + 0.55} h={0.95} color={BLUE} emissive={BLUE} />
